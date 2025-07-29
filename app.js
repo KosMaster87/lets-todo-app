@@ -9,28 +9,35 @@ function todoApp() {
   this.mode = "guest";
   this.guestStarted = false;
   this.currentTodo = {};
+  this.userLoggedIn = false;
 
   this.init = function () {
     this.container = document.querySelector("#content");
     this.container.innerHTML = "";
 
-    // 1) Cookie auslesen
+    // 1) User-Cookie prüfen
+    const userCookie = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("userId="));
+    if (userCookie) {
+      this.userLoggedIn = true;
+      this.mode = "list";
+    } else {
+      this.userLoggedIn = false;
+    }
+
+    // 2) Guest-Cookie prüfen
     const guestCookie = document.cookie
       .split("; ")
       .find((row) => row.startsWith("guestId="));
 
-    // 2) Wenn Cookie da ist, Gast‑Modus aktivieren
-    if (guestCookie) {
-      this.guestStarted = true;
-      this.mode = this.mode === "guest" ? "list" : this.mode;
-    }
-
-    // 3) Gast‑ID anzeigen (falls gesetzt)
-    this.showGuestCookie();
-
-    // 4) UI bauen
-    if (!this.guestStarted) {
-      this.printGuestStart();
+    // 3) UI bauen
+    if (this.userLoggedIn) {
+      this.printLogout();
+      this.printBtn();
+      this.getAllTodos();
+    } else if (!this.guestStarted) {
+      this.printAuthOptions();
     } else if (this.mode === "list") {
       this.printBtn();
       this.getAllTodos();
@@ -87,6 +94,104 @@ function todoApp() {
     this.mode = mode;
     this.container.innerHTML = "";
     this.init();
+  };
+
+  this.printAuthOptions = function () {
+    const html = `
+      <div style="text-align:center; margin-top:2rem;">
+        <button class="btn-todo btn-login" id="btn-login">Login</button>
+        <button class="btn-todo btn-register" id="btn-register">Registrieren</button>
+        <button class="btn-todo btn-guest" id="btn-guest">Als Gast starten</button>
+      </div>
+    `;
+    this.container.insertAdjacentHTML("beforeend", html);
+
+    this.container.querySelector("#btn-login").addEventListener("click", () => {
+      this.printLoginForm();
+    });
+    this.container.querySelector("#btn-register").addEventListener("click", () => {
+      this.printRegisterForm();
+    });
+    this.container.querySelector("#btn-guest").addEventListener("click", () => {
+      this.apiHandler(API_BASE, "GET")
+        .then(() => {
+          this.guestStarted = true;
+          this.mode = "list";
+          this.init();
+        })
+        .catch(console.error);
+    });
+  };
+
+  this.printLoginForm = function () {
+    const html = `
+      <form id="login-form" style="margin:2rem auto; max-width:320px;">
+        <input type="email" id="login-email" placeholder="Email" required class="form-input-generally form-input" style="margin-bottom:1rem;width:100%;">
+        <input type="password" id="login-password" placeholder="Passwort" required class="form-input-generally form-input" style="margin-bottom:1rem;width:100%;">
+        <button class="btn-todo" id="btn-login-submit" type="submit">Login</button>
+        <button class="btn-todo" id="btn-login-cancel" type="button">Abbrechen</button>
+      </form>
+    `;
+    this.container.innerHTML = html;
+    this.container.querySelector("#login-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = this.container.querySelector("#login-email").value;
+      const password = this.container.querySelector("#login-password").value;
+      this.apiHandler(`${API_BASE}/login`, "POST", { email, password })
+        .then(() => {
+          this.userLoggedIn = true;
+          this.mode = "list";
+          this.init();
+        })
+        .catch((err) => alert("Login fehlgeschlagen"));
+    });
+    this.container.querySelector("#btn-login-cancel").addEventListener("click", () => {
+      this.init();
+    });
+  };
+
+  this.printRegisterForm = function () {
+    const html = `
+      <form id="register-form" style="margin:2rem auto; max-width:320px;">
+        <input type="email" id="register-email" placeholder="Email" required class="form-input-generally form-input" style="margin-bottom:1rem;width:100%;">
+        <input type="password" id="register-password" placeholder="Passwort" required class="form-input-generally form-input" style="margin-bottom:1rem;width:100%;">
+        <button class="btn-todo" id="btn-register-submit" type="submit">Registrieren</button>
+        <button class="btn-todo" id="btn-register-cancel" type="button">Abbrechen</button>
+      </form>
+    `;
+    this.container.innerHTML = html;
+    this.container.querySelector("#register-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = this.container.querySelector("#register-email").value;
+      const password = this.container.querySelector("#register-password").value;
+      this.apiHandler(`${API_BASE}/register`, "POST", { email, password })
+        .then(() => {
+          alert("Registrierung erfolgreich! Jetzt einloggen.");
+          this.printLoginForm();
+        })
+        .catch((err) => alert("Registrierung fehlgeschlagen"));
+    });
+    this.container.querySelector("#btn-register-cancel").addEventListener("click", () => {
+      this.init();
+    });
+  };
+
+  this.printLogout = function () {
+    const html = `
+      <div style="text-align:right;">
+        <button class="btn-todo btn-logout" id="btn-logout">Logout</button>
+      </div>
+    `;
+    this.container.insertAdjacentHTML("afterbegin", html);
+    this.container.querySelector("#btn-logout").addEventListener("click", () => {
+      this.apiHandler(`${API_BASE}/logout`, "POST")
+        .then(() => {
+          this.userLoggedIn = false;
+          this.mode = "guest";
+          this.guestStarted = false;
+          this.init();
+        });
+    });
   };
 
   // ============================================================
