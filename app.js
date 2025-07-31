@@ -15,13 +15,19 @@ function todoApp() {
     this.container = document.querySelector("#content");
     this.container.innerHTML = "";
 
+    // Debug: Print cookies
+    console.log("Cookies:", document.cookie);
+
     // 1) User-Cookie prüfen
     const userCookie = document.cookie
       .split("; ")
       .find((row) => row.startsWith("userId="));
+    console.log("userCookie:", userCookie);
+
     if (userCookie) {
       this.userLoggedIn = true;
       this.mode = "list";
+      console.log("UI: User logged in, show list");
     } else {
       this.userLoggedIn = false;
     }
@@ -30,18 +36,23 @@ function todoApp() {
     const guestCookie = document.cookie
       .split("; ")
       .find((row) => row.startsWith("guestId="));
+    console.log("guestCookie:", guestCookie);
 
     // 3) UI bauen
     if (this.userLoggedIn) {
+      console.log("UI: printLogout, printBtn, getAllTodos");
       this.printLogout();
       this.printBtn();
       this.getAllTodos();
     } else if (!this.guestStarted) {
+      console.log("UI: printAuthOptions");
       this.printAuthOptions();
     } else if (this.mode === "list") {
+      console.log("UI: printBtn, getAllTodos (guest)");
       this.printBtn();
       this.getAllTodos();
     } else if (this.mode === "form") {
+      console.log("UI: printBtn, printForm (guest)");
       this.printBtn();
       this.printForm();
     }
@@ -499,13 +510,16 @@ function todoApp() {
       options.body = JSON.stringify(data);
     }
 
+    // Debug: Print API call
+    console.log("API call:", method, url, data);
+
     return fetch(url, options)
       .then((response) => {
         if (!response.ok) throw new Error("Netzwerkantwort war nicht ok");
         return response.json();
       })
       .catch((error) => {
-        console.error("Fehler bei API-Anfrage:", error);
+        console.error("Fehler bei API-Anfrage:", error, "URL:", url);
         throw error;
       });
   };
