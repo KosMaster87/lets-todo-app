@@ -1,4 +1,5 @@
-````instructions
+<!-- copilot-instructions.md -->
+
 # Copilot Instructions für das Frontend (todoApp.js)
 
 ## Allgemeine Vorgaben
@@ -83,14 +84,23 @@ POST   /api/login      - Login (E-Mail, Passwort)
 POST   /api/logout     - Logout (Cookie löschen)
 ```
 
+## Cookie-Handling
+- Alle Cookies verwenden Domain `.dev2k.org` für Subdomain-übergreifenden Zugriff
+- Session-Cookies sind persistent (7 Tage maxAge)
+- Strikte Trennung: Nur userId ODER guestId, niemals beide gleichzeitig
+- Cookie-Erkennung mit Debug-Logging für Troubleshooting
+
+## Session-Management
+- Session-Validierung bei App-Start über `/api/session/validate`
+- Bei ungültiger Session: Cookies löschen und Auth-UI zeigen
+- User-Session hat Vorrang vor Gast-Session
+
 ## Sonstiges
 
 - Schreibe kurze, prägnante Commit-Messages auf Deutsch.
 - Dokumentiere neue Umgebungsvariablen oder API-Änderungen in einer README.md.
 
----
-
-# Tech Debt & Optimierungen
+## Tech Debt & Optimierungen
 
 ```PlainText
 - [ ] **Bessere Fehleranzeige im UI**: Fehler nicht nur in der Konsole, sondern auch im DOM anzeigen
@@ -99,7 +109,7 @@ POST   /api/logout     - Logout (Cookie löschen)
 - [ ] **Tests**: Frontend-Tests mit z. B. Jest oder Cypress ergänzen
 ```
 
-# Lizenz & Style
+## Lizenz & Style
 
 ```javascript
 Comment-Style: Deutsch
