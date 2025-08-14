@@ -1,192 +1,128 @@
+/**
+ * Todo-App Frontend - Haupt-Anwendung (Refactored)
+ * Features:
+ * - Session-basierte Authentifizierung (User/Gast)
+ * - RESTful API-Kommunikation
+ * - Dynamisches UI-Rendering
+ */
+
 "use strict";
 
-// Basis-URL ohne abschließenden Slash
-const API_BASE = "https://api-restful-notes-user-session.dev2k.org/api";
-
-// Entwicklungs-Flag: KORRIGIERT für .dev2k.org als Production-Domain
-const IS_PRODUCTION = 
-  window.location.hostname.includes('.dev2k.org');    // Ihre Production-Domain
-
-const IS_DEVELOPMENT = 
-  !IS_PRODUCTION &&                                   // Alles andere als .dev2k.org
-  (window.location.hostname === 'localhost' || 
-   window.location.hostname === '127.0.0.1' ||
-   window.location.search.includes('debug=true') ||    // URL-Parameter für Debug
-   window.location.port !== '');                        // Hat einen Port = Development
-
+/**
+ * Todo-App Hauptklasse (als Function Constructor)
+ * Verwaltet UI-Status und koordiniert SessionManager + ApiClient
+ * @constructor
+ */
 function todoApp() {
+  /** @type {HTMLElement} Container-Element für das UI */
   this.container = "";
+
+  /** @type {string} Aktueller UI-Modus: "guest", "list", "form" */
   this.mode = "guest";
-  this.guestStarted = false;
+
+  /** @type {Object} Aktuell bearbeitetes Todo */
   this.currentTodo = {};
-  this.userLoggedIn = false;
 
-  // Helper function to get cookie value - ERWEITERT MIT DOMAIN-INFO
-  this.getCookie = function (name) {
-    console.log(`🍪 Alle verfügbaren Cookies:`, document.cookie);
-    console.log(`🌐 Aktuelle Domain:`, window.location.hostname);
-    console.log(`🌐 Aktuelle URL:`, window.location.href);
-    console.log(`🍪 Suche nach Cookie: ${name}`);
+  /** @type {SessionManager} Session-Management */
+  this.sessionManager = new SessionManager();
 
-    // Alle Cookie-Parsing-Varianten probieren
-    const allCookies = document.cookie.split(";").map((c) => c.trim());
-    console.log(`🍪 Cookie-Array:`, allCookies);
+  /** @type {ApiClient} API-Client */
+  this.apiClient = new ApiClient();
 
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-      const cookieValue = parts.pop().split(";").shift();
-      console.log(`✅ Cookie ${name} gefunden:`, cookieValue);
-      return cookieValue;
-    }
-
-    // Alternative: direkter Suchversuch
-    const altSearch = allCookies.find((cookie) =>
-      cookie.startsWith(`${name}=`)
-    );
-    if (altSearch) {
-      const altValue = altSearch.split("=")[1];
-      console.log(`✅ Cookie ${name} alternativ gefunden:`, altValue);
-      return altValue;
-    }
-
-    console.log(`❌ Cookie ${name} nicht gefunden`);
-    return null;
-  };
-
+  /**
+   * App-Initialisierung
+   */
   this.init = function () {
     this.container = document.querySelector("#content");
     this.container.innerHTML = "";
 
-    // VEREINFACHT: Nur Session-Validierung verwenden, Cookie-Reading überspringen
-    console.log("🚀 App-Start: Direkte Session-Validierung...");
+    // Error-Handler für API-Client registrieren
+    this.apiClient.setErrorHandler((msg) => this.showError(msg));
 
-    // Session-Status vom Backend validieren
-    this.validateSession()
+    console.log("🚀 App-Start: Session-Validierung...");
+
+    // Session über SessionManager validieren
+    this.sessionManager
+      .validateSession((url, method, data) =>
+        this.apiClient.request(url, method, data)
+      )
       .then((response) => {
         console.log("Session-Validierung Antwort:", response);
 
+        // Modus basierend auf Session setzen
         if (response.valid) {
-          if (response.type === "user") {
-            this.userLoggedIn = true;
-            this.guestStarted = false;
-            // MODE KORRIGIEREN: Bei gültiger Session auf "list" setzen
-            if (this.mode === "guest") this.mode = "list";
-          } else if (response.type === "guest") {
-            this.userLoggedIn = false;
-            this.guestStarted = true;
-            // MODE KORRIGIEREN: Bei gültiger Session auf "list" setzen
-            if (this.mode === "guest") this.mode = "list";
-          }
+          this.mode = this.mode === "guest" ? "list" : this.mode;
         } else {
-          this.userLoggedIn = false;
-          this.guestStarted = false;
-          this.mode = "guest"; // Zurück zu Auth-Optionen
+          this.mode = "guest";
         }
 
         this.buildUI();
       })
       .catch(() => {
-        // Falls Session-Validierung fehlschlägt
-        this.userLoggedIn = false;
-        this.guestStarted = false;
+        this.sessionManager.reset();
         this.mode = "guest";
         this.buildUI();
       });
   };
 
-  // Session-Validierung beim Backend - VERBESSERT
-  this.validateSession = function () {
-    return this.apiHandler(`${API_BASE}/session/validate`, "GET").then(
-      (response) => {
-        console.log("Session-Validierung:", response);
-
-        if (response.valid) {
-          if (response.type === "user") {
-            this.userLoggedIn = true;
-            this.guestStarted = false;
-          } else if (response.type === "guest") {
-            this.userLoggedIn = false;
-            this.guestStarted = true;
-          }
-        } else {
-          this.userLoggedIn = false;
-          this.guestStarted = false;
-        }
-
-        return response;
-      }
-    );
-  };
-
-  // Cookies löschen (falls Session ungültig)
-  this.clearAllCookies = function () {
-    document.cookie =
-      "guestId=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.api-restful-notes-user-session.dev2k.org";
-    document.cookie =
-      "userId=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.api-restful-notes-user-session.dev2k.org";
-  };
-
-  // UI aufbauen basierend auf Status
+  /**
+   * UI aufbauen
+   */
   this.buildUI = function () {
-    // Container leeren für UI-Wechsel
     this.container.innerHTML = "";
 
-    // Session-Info anzeigen
-    this.showSessionInfo();
+    // Session-Info über SessionManager anzeigen
+    const sessionInfoHTML = this.sessionManager.getSessionInfoHTML();
+    if (sessionInfoHTML) {
+      this.container.insertAdjacentHTML("beforeend", sessionInfoHTML);
+    }
 
-    // UI bauen basierend auf Status
-    if (!this.userLoggedIn && !this.guestStarted) {
-      // Kein Cookie: Menü mit allen drei Optionen
+    // UI basierend auf Session-Status
+    if (
+      !this.sessionManager.isUserLoggedIn() &&
+      !this.sessionManager.isGuestStarted()
+    ) {
       this.mode = "guest";
       this.printAuthOptions();
-    } else if (this.userLoggedIn) {
-      // MODE-FIX: Bei gültiger User-Session immer auf "list" setzen, außer explizit "form"
+    } else if (this.sessionManager.isUserLoggedIn()) {
       if (this.mode === "guest") this.mode = "list";
-
       this.printLogout();
-
-      if (this.mode === "list") {
-        this.printBtn();
-        this.getAllTodos();
-      } else if (this.mode === "form") {
-        this.printBtn();
-        this.printForm();
-      }
-    } else if (this.guestStarted) {
-      // MODE-FIX: Bei gültiger Gast-Session immer auf "list" setzen, außer explizit "form"
+      this.printModeContent();
+    } else if (this.sessionManager.isGuestStarted()) {
       if (this.mode === "guest") this.mode = "list";
-
-      this.printGuestInfo(); // Gast-spezifische Buttons
-
-      if (this.mode === "list") {
-        this.printBtn();
-        this.getAllTodos();
-      } else if (this.mode === "form") {
-        this.printBtn();
-        this.printForm();
-      }
+      this.printGuestInfo();
+      this.printModeContent();
     }
   };
 
-  this.showSessionInfo = function () {
-    const guestCookie = this.getCookie("guestId");
-    const userCookie = this.getCookie("userId");
-
-    if (guestCookie && this.guestStarted) {
-      this.container.insertAdjacentHTML(
-        "beforeend",
-        `<p style="font-size:0.8rem; color:#666">Gast-Session: ${guestCookie}</p>`
-      );
-    } else if (userCookie && this.userLoggedIn) {
-      this.container.insertAdjacentHTML(
-        "beforeend",
-        `<p style="font-size:0.8rem; color:#666">Benutzer-Session: User ${userCookie}</p>`
-      );
+  /**
+   * Modus-abhängigen Content anzeigen
+   */
+  this.printModeContent = function () {
+    if (this.mode === "list") {
+      this.printBtn();
+      this.loadAndDisplayTodos();
+    } else if (this.mode === "form") {
+      this.printBtn();
+      this.printForm();
     }
   };
 
-  // Gast-spezifische Info und Registrierungs-Option
+  /**
+   * Todos laden und anzeigen (verwendet ApiClient)
+   */
+  this.loadAndDisplayTodos = function () {
+    this.apiClient
+      .getAllTodos()
+      .then((todos) => {
+        todos.forEach((todo) => this.printTodo(todo));
+      })
+      .catch(console.error);
+  };
+
+  /**
+   * Gast-spezifische UI-Elemente rendern
+   */
   this.printGuestInfo = function () {
     const html = `
       <div style="text-align:right; margin-bottom:1rem;">
@@ -196,21 +132,21 @@ function todoApp() {
     `;
     this.container.insertAdjacentHTML("beforeend", html);
 
-    // Account erstellen aus Gast-Session
+    // Event-Handler
     this.container
       .querySelector("#btn-register-from-guest")
       .addEventListener("click", () => {
         this.printRegisterForm();
       });
 
-    // Gast-Session beenden
+    // Gast-Session beenden über ApiClient
     this.container
       .querySelector("#btn-end-guest")
       .addEventListener("click", () => {
-        this.apiHandler(`${API_BASE}/session/guest/end`, "POST")
+        this.apiClient
+          .endGuestSession()
           .then(() => {
-            this.guestStarted = false;
-            this.userLoggedIn = false;
+            this.sessionManager.reset();
             this.mode = "guest";
             this.init();
           })
@@ -218,6 +154,10 @@ function todoApp() {
       });
   };
 
+  /**
+   * Aktuelles Todo-Objekt zurücksetzen
+   * Initialisiert leeres Todo für Neu-Erstellung
+   */
   this.resetCurrentTodo = function () {
     this.currentTodo = {
       id: 0,
@@ -227,12 +167,19 @@ function todoApp() {
     };
   };
 
+  /**
+   * UI-Modus wechseln ohne komplette Neuinitialisierung
+   * @param {string} mode - Neuer Modus ("list", "form", "guest")
+   */
   this.changeMode = function (mode) {
     this.mode = mode;
-    // NICHT mehr this.init() aufrufen, sondern nur UI neu bauen
+    // Nur UI neu bauen, nicht komplette App neu starten
     this.buildUI();
   };
 
+  /**
+   * Authentifizierungs-Optionen rendern
+   */
   this.printAuthOptions = function () {
     const html = `
     <div style="text-align:center; margin-top:2rem;">
@@ -243,25 +190,24 @@ function todoApp() {
   `;
     this.container.insertAdjacentHTML("beforeend", html);
 
-    // Login-Button
+    // Event-Handler
     this.container.querySelector("#btn-login").addEventListener("click", () => {
       this.printLoginForm();
     });
 
-    // Registrieren-Button
     this.container
       .querySelector("#btn-register")
       .addEventListener("click", () => {
         this.printRegisterForm();
       });
 
-    // Gast starten-Button
+    // Gast-Session starten über ApiClient
     this.container.querySelector("#btn-guest").addEventListener("click", () => {
-      // Gast-Session anfordern
-      this.apiHandler(`${API_BASE}/session/guest`, "POST") // Changed to POST
+      this.apiClient
+        .startGuestSession()
         .then(() => {
-          this.guestStarted = true;
-          this.userLoggedIn = false;
+          this.sessionManager.guestStarted = true;
+          this.sessionManager.userLoggedIn = false;
           this.mode = "list";
           this.init();
         })
@@ -269,6 +215,9 @@ function todoApp() {
     });
   };
 
+  /**
+   * Login-Formular rendern (verwendet ApiClient)
+   */
   this.printLoginForm = function () {
     const html = `
       <form id="login-form" style="margin:2rem auto; max-width:320px;">
@@ -279,27 +228,35 @@ function todoApp() {
       </form>
     `;
     this.container.innerHTML = html;
+
     this.container
       .querySelector("#login-form")
       .addEventListener("submit", (e) => {
         e.preventDefault();
         const email = this.container.querySelector("#login-email").value;
         const password = this.container.querySelector("#login-password").value;
-        this.apiHandler(`${API_BASE}/login`, "POST", { email, password })
+
+        // Login über ApiClient
+        this.apiClient
+          .login(email, password)
           .then(() => {
-            // Nach Login: UI auf Notizliste
-            this.userLoggedIn = true;
-            this.guestStarted = false;
+            // Session-Status nach Login aktualisieren
+            this.sessionManager.userLoggedIn = true;
+            this.sessionManager.guestStarted = false;
             this.mode = "list";
             this.init();
           })
           .catch(() => alert("Login fehlgeschlagen"));
       });
+
     this.container
       .querySelector("#btn-login-cancel")
       .addEventListener("click", () => this.init());
   };
 
+  /**
+   * Registrierungs-Formular rendern (verwendet ApiClient)
+   */
   this.printRegisterForm = function () {
     const html = `
       <form id="register-form" style="margin:2rem auto; max-width:320px;">
@@ -310,6 +267,7 @@ function todoApp() {
       </form>
     `;
     this.container.innerHTML = html;
+
     this.container
       .querySelector("#register-form")
       .addEventListener("submit", (e) => {
@@ -317,25 +275,28 @@ function todoApp() {
         const email = this.container.querySelector("#register-email").value;
         const password =
           this.container.querySelector("#register-password").value;
-        this.apiHandler(`${API_BASE}/register`, "POST", { email, password })
+
+        // Registrierung über ApiClient
+        this.apiClient
+          .register(email, password)
           .then(() => {
             alert("Registrierung erfolgreich! Jetzt einloggen.");
             this.printLoginForm();
           })
           .catch((err) => {
-            // Fehlerbehandlung für 409 Conflict (E-Mail bereits registriert)
-            if (err && err.message && err.message.includes("409")) {
-              this.showError("Diese E-Mail ist bereits registriert.");
-            } else {
-              this.showError("Registrierung fehlgeschlagen.");
-            }
+            // Error-Handling wird bereits über ApiClient.errorHandler gemacht
+            console.error("Registrierung fehlgeschlagen:", err);
           });
       });
+
     this.container
       .querySelector("#btn-register-cancel")
       .addEventListener("click", () => this.init());
   };
 
+  /**
+   * Logout-Button rendern (verwendet ApiClient)
+   */
   this.printLogout = function () {
     const html = `
       <div style="text-align:right;">
@@ -343,36 +304,39 @@ function todoApp() {
       </div>
     `;
     this.container.insertAdjacentHTML("afterbegin", html);
+
     this.container
       .querySelector("#btn-logout")
       .addEventListener("click", () => {
-        this.apiHandler(`${API_BASE}/logout`, "POST").then(() => {
-          this.userLoggedIn = false;
+        // Logout über ApiClient
+        this.apiClient.logout().then(() => {
+          this.sessionManager.reset();
           this.mode = "guest";
-          this.guestStarted = false;
           this.init();
         });
       });
   };
 
-  // ============================================================
-
+  /**
+   * Modus-abhängige Action-Buttons rendern
+   * "Todo anlegen" in List-Modus, "Zurück" in Form-Modus
+   */
   this.printBtn = function () {
-    // "Neues Todo" oder "Zurück"-Button je nach Modus
     if (this.mode === "list") {
       const html = `<div><button class="btn-todo btn-todo-add" id="btn-todo-add">Todo anlegen</button></div>`;
       this.container.insertAdjacentHTML("beforeend", html);
+
       this.container
         .querySelector("#btn-todo-add")
         .addEventListener("click", (e) => {
           e.preventDefault();
           this.resetCurrentTodo();
-          // DIREKT changeMode aufrufen ohne preventDefault
           this.changeMode("form");
         });
     } else if (this.mode === "form") {
       const html = `<div><button class="btn-todo btn-todo-back" id="btn-todo-back">Zurück zur Todo-Liste</button></div>`;
       this.container.insertAdjacentHTML("beforeend", html);
+
       this.container
         .querySelector("#btn-todo-back")
         .addEventListener("click", (e) => {
@@ -383,8 +347,9 @@ function todoApp() {
     }
   };
 
-  // ============================================================
-
+  /**
+   * Einzelnes Todo-Item rendern (verwendet ApiClient)
+   */
   this.printTodo = function (todo) {
     const html = `
       <div class="todo-item-wrapper" id="todo-item-${todo.id}">
@@ -413,43 +378,46 @@ function todoApp() {
     `;
     this.container.insertAdjacentHTML("beforeend", html);
 
-    // Checkbox-Handler
+    // Checkbox-Handler: Verwendet ApiClient
     this.container
       .querySelector(`#todo-${todo.id}-check`)
       .addEventListener("change", (e) => {
         e.preventDefault();
-        this.updateTodo({
-          id: todo.id,
+        const updateData = {
           completed: e.target.checked ? 1 : 0,
-        }).then(() => {
+        };
+
+        this.apiClient.updateTodo(todo.id, updateData).then(() => {
           this.container
             .querySelector(`#todo-${todo.id}-check-label`)
             .classList.toggle("todo-item-completed", e.target.checked);
         });
       });
 
-    // Bearbeiten
+    // Edit-Handler: Verwendet ApiClient
     this.container
       .querySelector(`#note-edit-${todo.id}`)
       .addEventListener("click", () => {
-        this.getTodo(todo).then((json) => {
+        this.apiClient.getTodo(todo.id).then((json) => {
           this.currentTodo = json;
           this.changeMode("form");
         });
       });
 
-    // Löschen
+    // Delete-Handler: Verwendet ApiClient
     this.container
       .querySelector(`#note-delete-${todo.id}`)
       .addEventListener("click", () => {
-        this.deleteTodo(todo).then(() => {
+        this.apiClient.deleteTodo(todo.id).then(() => {
           this.container.querySelector(`#todo-item-${todo.id}`).remove();
         });
       });
   };
 
-  // ============================================================
-
+  /**
+   * Todo-Erstellungs-/Bearbeitungs-Formular rendern
+   * Dynamisches Formular mit Validierung und Dual-Submit-Buttons
+   */
   this.printForm = function () {
     const html = `
       <div class="todo-item-wrapper">
@@ -487,17 +455,18 @@ function todoApp() {
     `;
     this.container.insertAdjacentHTML("beforeend", html);
 
-    // Save und Next-Handler
+    // Submit-Handler registrieren
     this.container
       .querySelector("#btn-todo-submit")
       .addEventListener("click", (e) => this.saveTodoHandler(e));
+
     if (this.currentTodo.id === 0) {
       this.container
         .querySelector("#todo-submit-next")
         .addEventListener("click", (e) => this.saveTodoHandler(e, "next"));
     }
 
-    // Formularvalidierung
+    // Live-Validierung aktivieren
     setupFormValidation(
       this.container.querySelector("#todo-title"),
       this.container.querySelector("#btn-todo-submit"),
@@ -507,119 +476,43 @@ function todoApp() {
     );
   };
 
-  // ============================================================
-
+  /**
+   * Todo-Speichern-Handler (verwendet ApiClient)
+   */
   this.saveTodoHandler = function (event, mode = "save") {
     event.preventDefault();
     const title = this.container.querySelector("#todo-title").value;
     const description = this.container.querySelector("#todo-description").value;
     const completed = this.container.querySelector("#todo-completed").checked;
 
-    const todo = {
-      id: parseInt(event.target.dataset.id),
+    const todoData = {
       title,
       description,
       completed: completed ? 1 : 0,
     };
 
-    if (todo.id > 0) {
-      this.updateTodo(todo).then(() => this.changeMode("list"));
+    const todoId = parseInt(event.target.dataset.id);
+
+    if (todoId > 0) {
+      // Update über ApiClient
+      this.apiClient
+        .updateTodo(todoId, todoData)
+        .then(() => this.changeMode("list"));
     } else if (mode === "save") {
-      this.createTodo(todo).then(() => this.changeMode("list"));
+      // Create über ApiClient
+      this.apiClient.createTodo(todoData).then(() => this.changeMode("list"));
     } else {
-      this.createTodo(todo).then(() => {
+      // Create und neues Formular
+      this.apiClient.createTodo(todoData).then(() => {
         this.resetCurrentTodo();
         this.changeMode("form");
       });
     }
   };
 
-  // ============================================================
-
-  this.getAllTodos = function () {
-    this.apiHandler(`${API_BASE}/todos`, "GET").then((json) => {
-      json.forEach((t) => this.printTodo(t));
-    });
-  };
-
-  this.getTodo = (data) =>
-    this.apiHandler(`${API_BASE}/todos/${data.id}`, "GET");
-
-  this.createTodo = (data) =>
-    this.apiHandler(`${API_BASE}/todos`, "POST", data);
-
-  this.updateTodo = (data) =>
-    this.apiHandler(`${API_BASE}/todos/${data.id}`, "PATCH", data);
-
-  this.deleteTodo = (data) =>
-    this.apiHandler(`${API_BASE}/todos/${data.id}`, "DELETE", data);
-
-  // ============================================================
-  // API handler mit verbesserter Fehlerbehandlung
-  this.apiHandler = function (url, method, data = null) {
-    url = url.replace(/([^:]\/)\/+/g, "$1");
-
-    const options = {
-      method,
-      cache: "no-cache",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-    };
-    if (data !== null) options.body = JSON.stringify(data);
-
-    // Logging nur in echten Development-Umgebungen
-    if (IS_DEVELOPMENT) {
-      console.log(`🔗 API ${method} ${url}`, data || '(keine Daten)');
-    }
-
-    return fetch(url, options)
-      .then((res) => {
-        if (!res.ok) {
-          // Fehlertext für spezielle Fehlercodes extrahieren
-          return res
-            .json()
-            .then((json) => {
-              const error = new Error("Netzwerkantwort war nicht ok");
-              error.status = res.status;
-              error.apiMessage =
-                json && json.error ? json.error : json.message || "";
-              throw error;
-            })
-            .catch(() => {
-              // Falls JSON-Parsing fehlschlägt
-              const error = new Error("Netzwerkantwort war nicht ok");
-              error.status = res.status;
-              error.apiMessage = `HTTP ${res.status} ${res.statusText}`;
-              throw error;
-            });
-        }
-        return res.json();
-      })
-      .catch((err) => {
-        console.error("Fehler bei API-Anfrage:", err, "URL:", url);
-
-        // Session-Validierung: keine UI-Fehlermeldung
-        if (url.includes("/session/validate")) {
-          throw err;
-        }
-
-        // Fehler auch im UI anzeigen für andere Endpoints
-        if (err.status === 409) {
-          this.showError("Diese E-Mail ist bereits registriert.");
-        } else if (err.status === 401) {
-          this.showError("Session ungültig. Bitte neu anmelden.");
-        } else if (err.apiMessage) {
-          this.showError(err.apiMessage);
-        } else {
-          this.showError(
-            "Fehler bei der Serveranfrage. Bitte später erneut versuchen."
-          );
-        }
-        throw err;
-      });
-  };
-
-  // Fehleranzeige im UI (optional)
+  /**
+   * Fehleranzeige im UI
+   */
   this.showError = function (msg) {
     let errorDiv = this.container.querySelector(".todo-error");
     if (!errorDiv) {
@@ -633,14 +526,21 @@ function todoApp() {
   };
 }
 
-// DOM ready
+/**
+ * DOM-Ready Event-Handler
+ * Initialisiert Todo-App nach vollständigem DOM-Loading
+ */
 document.addEventListener("DOMContentLoaded", () => {
   const todoAppInstance = new todoApp();
   todoAppInstance.init();
 });
 
 /**
- * Form Validation for title input
+ * Live-Formularvalidierung für Titel-Input
+ * Aktiviert/Deaktiviert Submit-Buttons basierend auf Titel-Eingabe
+ * @param {HTMLInputElement} titleInput - Titel-Eingabefeld
+ * @param {HTMLButtonElement} submitBtn - Haupt-Submit-Button
+ * @param {HTMLButtonElement|null} [submitNextBtn=null] - Optionaler "Speichern ++" Button
  */
 function setupFormValidation(titleInput, submitBtn, submitNextBtn = null) {
   function toggle() {
@@ -649,5 +549,5 @@ function setupFormValidation(titleInput, submitBtn, submitNextBtn = null) {
     if (submitNextBtn) submitNextBtn.disabled = empty;
   }
   titleInput.addEventListener("input", toggle);
-  toggle();
+  toggle(); // Initial-Validierung
 }
