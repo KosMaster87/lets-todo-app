@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/style.css" />
     <link rel="stylesheet" href="/assets/styles/comic.css" />
     <link rel="icon" href="/assets/favicon.png" />
-    <title>RESTful-Notes</title>
+    <title>RESTful Notes App</title>
   </head>
   <body>
     <div class="container">
@@ -14,10 +14,12 @@
       <div class="content" id="content"></div>
     </div>
 
-    <!-- JavaScript Module in korrekter Reihenfolge laden -->
-    <script src="/js/utils/formValidation.js"></script>
-    <script src="/js/sessionManager.js"></script>
-    <script src="/js/apiClient.js"></script>
-    <script src="/app.js"></script>
+    <script src="js/utils/formValidation.js"></script>
+    <script src="js/templates/htmlTemplates.js"></script>
+    <script src="js/handlers/eventHandlers.js"></script>
+    <script src="js/ui/uiRenderer.js"></script>
+    <script src="js/sessionManager.js"></script>
+    <script src="js/apiClient.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>
