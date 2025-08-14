@@ -534,20 +534,3 @@ document.addEventListener("DOMContentLoaded", () => {
   const todoAppInstance = new todoApp();
   todoAppInstance.init();
 });
-
-/**
- * Live-Formularvalidierung für Titel-Input
- * Aktiviert/Deaktiviert Submit-Buttons basierend auf Titel-Eingabe
- * @param {HTMLInputElement} titleInput - Titel-Eingabefeld
- * @param {HTMLButtonElement} submitBtn - Haupt-Submit-Button
- * @param {HTMLButtonElement|null} [submitNextBtn=null] - Optionaler "Speichern ++" Button
- */
-function setupFormValidation(titleInput, submitBtn, submitNextBtn = null) {
-  function toggle() {
-    const empty = titleInput.value.trim() === "";
-    submitBtn.disabled = empty;
-    if (submitNextBtn) submitNextBtn.disabled = empty;
-  }
-  titleInput.addEventListener("input", toggle);
-  toggle(); // Initial-Validierung
-}
