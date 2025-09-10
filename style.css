@@ -20,7 +20,7 @@ body {
 .content {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  /* align-items: flex-start; */
   flex-direction: column;
   margin-top: 2rem;
   padding: 1rem;
@@ -28,6 +28,16 @@ body {
   border-radius: 1rem;
   background-color: rgb(170, 136, 109);
   gap: 1rem;
+}
+
+/* --- */
+
+.auth-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: center;
+  margin-top: 2rem;
 }
 
 /* --- */

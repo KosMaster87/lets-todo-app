@@ -5,31 +5,21 @@
 
 "use strict";
 
-// Basis-URL ohne abschließenden Slash
-const API_BASE = "https://api-restful-notes-user-session.dev2k.org/api";
-
 /**
- * Development-Flag für Logging
- * @type {boolean}
- */
-const IS_DEVELOPMENT =
-  !window.location.hostname.includes(".dev2k.org") &&
-  (window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1" ||
-    window.location.search.includes("debug=true") ||
-    window.location.port !== "");
-
-/**
- * API-Client Klasse
+ * API-Client für RESTful Communication
+ * Verwendet Environment-Konfiguration für API-Base-URL
  * @constructor
  */
 function ApiClient() {
+  /** @type {string} API-Base-URL aus Environment-Konfiguration */
+  this.apiBase = ENV.API_BASE;
+
   /** @type {Function} Error-Handler Callback */
   this.errorHandler = null;
 
   /**
    * Error-Handler registrieren
-   * @param {Function} handler - Fehlerbehandlungs-Funktion
+   * @param {Function} handler - Callback für Error-Handling
    */
   this.setErrorHandler = function (handler) {
     this.errorHandler = handler;
@@ -54,9 +44,9 @@ function ApiClient() {
 
     if (data !== null) options.body = JSON.stringify(data);
 
-    // Development-Logging
-    if (IS_DEVELOPMENT) {
-      console.log(`🔗 API ${method} ${url}`, data || "(keine Daten)");
+    // Environment-basiertes Logging
+    if (ENV.DEBUG) {
+      debugLog(`API ${method} ${url}`, data || "(keine Daten)");
     }
 
     return fetch(url, options)
@@ -115,7 +105,7 @@ function ApiClient() {
    * @returns {Promise<Array>}
    */
   this.getAllTodos = function () {
-    return this.request(`${API_BASE}/todos`, "GET");
+    return this.request(`${this.apiBase}/todos`, "GET");
   };
 
   /**
@@ -124,7 +114,7 @@ function ApiClient() {
    * @returns {Promise<Object>}
    */
   this.getTodo = function (id) {
-    return this.request(`${API_BASE}/todos/${id}`, "GET");
+    return this.request(`${this.apiBase}/todos/${id}`, "GET");
   };
 
   /**
@@ -133,7 +123,7 @@ function ApiClient() {
    * @returns {Promise<Object>}
    */
   this.createTodo = function (todoData) {
-    return this.request(`${API_BASE}/todos`, "POST", todoData);
+    return this.request(`${this.apiBase}/todos`, "POST", todoData);
   };
 
   /**
@@ -143,7 +133,7 @@ function ApiClient() {
    * @returns {Promise<Object>}
    */
   this.updateTodo = function (id, todoData) {
-    return this.request(`${API_BASE}/todos/${id}`, "PATCH", todoData);
+    return this.request(`${this.apiBase}/todos/${id}`, "PATCH", todoData);
   };
 
   /**
@@ -152,7 +142,7 @@ function ApiClient() {
    * @returns {Promise<Object>}
    */
   this.deleteTodo = function (id) {
-    return this.request(`${API_BASE}/todos/${id}`, "DELETE");
+    return this.request(`${this.apiBase}/todos/${id}`, "DELETE");
   };
 
   // ============================================================
@@ -166,7 +156,10 @@ function ApiClient() {
    * @returns {Promise<Object>}
    */
   this.register = function (email, password) {
-    return this.request(`${API_BASE}/register`, "POST", { email, password });
+    return this.request(`${this.apiBase}/register`, "POST", {
+      email,
+      password,
+    });
   };
 
   /**
@@ -176,7 +169,7 @@ function ApiClient() {
    * @returns {Promise<Object>}
    */
   this.login = function (email, password) {
-    return this.request(`${API_BASE}/login`, "POST", { email, password });
+    return this.request(`${this.apiBase}/login`, "POST", { email, password });
   };
 
   /**
@@ -184,7 +177,7 @@ function ApiClient() {
    * @returns {Promise<Object>}
    */
   this.logout = function () {
-    return this.request(`${API_BASE}/logout`, "POST");
+    return this.request(`${this.apiBase}/logout`, "POST");
   };
 
   /**
@@ -192,7 +185,7 @@ function ApiClient() {
    * @returns {Promise<Object>}
    */
   this.startGuestSession = function () {
-    return this.request(`${API_BASE}/session/guest`, "POST");
+    return this.request(`${this.apiBase}/session/guest`, "POST");
   };
 
   /**
@@ -200,6 +193,6 @@ function ApiClient() {
    * @returns {Promise<Object>}
    */
   this.endGuestSession = function () {
-    return this.request(`${API_BASE}/session/guest/end`, "POST");
+    return this.request(`${this.apiBase}/session/guest/end`, "POST");
   };
 }

@@ -23,11 +23,11 @@ const EventHandlers = {
     container.querySelector("#btn-guest").addEventListener("click", () => {
       app.apiClient
         .startGuestSession()
-        .then(() => {
+        .then((response) => {
+          debugLog("Gast-Session gestartet:", response);
           app.sessionManager.guestStarted = true;
           app.sessionManager.userLoggedIn = false;
-          app.mode = "list";
-          app.init();
+          app.changeMode("list"); // Nur UI wechseln, nicht neu initialisieren
         })
         .catch(console.error);
     });
@@ -46,18 +46,18 @@ const EventHandlers = {
 
       app.apiClient
         .login(email, password)
-        .then(() => {
+        .then((response) => {
+          debugLog("User-Login erfolgreich:", response);
           app.sessionManager.userLoggedIn = true;
           app.sessionManager.guestStarted = false;
-          app.mode = "list";
-          app.init();
+          app.changeMode("list"); // Nur UI wechseln, nicht neu initialisieren
         })
         .catch(() => alert("Login fehlgeschlagen"));
     });
 
     container
       .querySelector("#btn-login-cancel")
-      .addEventListener("click", () => app.init());
+      .addEventListener("click", () => app.changeMode("guest"));
   },
 
   /**
@@ -86,7 +86,7 @@ const EventHandlers = {
 
     container
       .querySelector("#btn-register-cancel")
-      .addEventListener("click", () => app.init());
+      .addEventListener("click", () => app.changeMode("guest"));
   },
 
   /**
@@ -96,10 +96,10 @@ const EventHandlers = {
    */
   setupLogoutButton: function (container, app) {
     container.querySelector("#btn-logout").addEventListener("click", () => {
-      app.apiClient.logout().then(() => {
+      app.apiClient.logout().then((response) => {
+        debugLog("User-Logout erfolgreich:", response);
         app.sessionManager.reset();
-        app.mode = "guest";
-        app.init();
+        app.changeMode("guest"); // Nur UI wechseln, nicht neu initialisieren
       });
     });
   },
@@ -119,10 +119,10 @@ const EventHandlers = {
     container.querySelector("#btn-end-guest").addEventListener("click", () => {
       app.apiClient
         .endGuestSession()
-        .then(() => {
+        .then((response) => {
+          debugLog("Gast-Session beendet:", response);
           app.sessionManager.reset();
-          app.mode = "guest";
-          app.init();
+          app.changeMode("guest"); // Nur UI wechseln, nicht neu initialisieren
         })
         .catch(console.error);
     });

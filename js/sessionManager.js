@@ -22,7 +22,7 @@ function SessionManager() {
    * @returns {string|null} Cookie-Wert oder null
    */
   this.getCookie = function (name) {
-    console.log(`🍪 Suche nach Cookie: ${name}`);
+    debugLog(`Suche nach Cookie: ${name}`);
 
     const allCookies = document.cookie.split(";").map((c) => c.trim());
     const value = `; ${document.cookie}`;
@@ -30,7 +30,7 @@ function SessionManager() {
 
     if (parts.length === 2) {
       const cookieValue = parts.pop().split(";").shift();
-      console.log(`✅ Cookie ${name} gefunden:`, cookieValue);
+      debugLog(`Cookie ${name} gefunden:`, cookieValue);
       return cookieValue;
     }
 
@@ -41,11 +41,11 @@ function SessionManager() {
 
     if (altSearch) {
       const altValue = altSearch.split("=")[1];
-      console.log(`✅ Cookie ${name} alternativ gefunden:`, altValue);
+      debugLog(`Cookie ${name} alternativ gefunden:`, altValue);
       return altValue;
     }
 
-    console.log(`❌ Cookie ${name} nicht gefunden`);
+    debugLog(`Cookie ${name} nicht gefunden`);
     return null;
   };
 
@@ -74,10 +74,9 @@ function SessionManager() {
    * @returns {Promise<Object>}
    */
   this.validateSession = function (apiHandler) {
-    const API_BASE = "https://api-restful-notes-user-session.dev2k.org/api";
-    return apiHandler(`${API_BASE}/session/validate`, "GET").then(
+    return apiHandler(`${ENV.API_BASE}/session/validate`, "GET").then(
       (response) => {
-        console.log("Session-Validierung:", response);
+        debugLog("Session-Validierung:", response);
         this.setSessionStatus(response);
         return response;
       }
@@ -88,10 +87,14 @@ function SessionManager() {
    * Alle Session-Cookies löschen
    */
   this.clearAllCookies = function () {
-    document.cookie =
-      "guestId=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.dev2k.org";
-    document.cookie =
-      "userId=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.dev2k.org";
+    // In Development keine Domain, in Production mit Domain
+    if (ENV.COOKIE_DOMAIN) {
+      document.cookie = `guestId=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${ENV.COOKIE_DOMAIN}`;
+      document.cookie = `userId=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${ENV.COOKIE_DOMAIN}`;
+    } else {
+      document.cookie = `guestId=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+      document.cookie = `userId=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+    }
   };
 
   /**

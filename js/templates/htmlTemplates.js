@@ -12,7 +12,7 @@ const HTMLTemplates = {
    */
   authOptions: function () {
     return `
-      <div style="text-align:center; margin-top:2rem;">
+      <div style="auth-options">
         <button class="btn-todo btn-login" id="btn-login">Login</button>
         <button class="btn-todo btn-register" id="btn-register">Registrieren</button>
         <button class="btn-todo btn-guest" id="btn-guest">Als Gast starten</button>

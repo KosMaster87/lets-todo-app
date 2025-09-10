@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Direkter Cookie-Test</title>
+    <style>
+      body {
+        font-family: monospace;
+        margin: 20px;
+      }
+      .test {
+        margin: 10px 0;
+        padding: 10px;
+        border: 1px solid #ccc;
+      }
+      .success {
+        background: #d4edda;
+      }
+      .error {
+        background: #f8d7da;
+      }
+      button {
+        padding: 8px 12px;
+        margin: 5px;
+      }
+      pre {
+        background: #f8f9fa;
+        padding: 10px;
+        border: 1px solid #ddd;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Direkter Development Cookie-Test</h1>
+
+    <div class="test">
+      <h3>🔧 Environment</h3>
+      <p><strong>Frontend URL:</strong> <span id="url"></span></p>
+      <p><strong>Backend API:</strong> http://127.0.0.1:3000/api</p>
+      <p><strong>Cookies aktiviert:</strong> <span id="cookies"></span></p>
+      <p><strong>Same Origin:</strong> <span id="origin"></span></p>
+    </div>
+
+    <div class="test">
+      <h3>🧪 Tests</h3>
+      <button onclick="manualCookieTest()">1. Manueller Cookie-Test</button>
+      <button onclick="apiTest()">2. API-Test mit Debug</button>
+      <button onclick="cookieInspect()">3. Cookie-Status prüfen</button>
+      <button onclick="clearAll()">❌ Alles löschen</button>
+    </div>
+
+    <div class="test">
+      <h3>📋 Status</h3>
+      <div id="status"></div>
+    </div>
+
+    <script>
+      // Environment Info
+      document.getElementById("url").textContent = window.location.href;
+      document.getElementById("cookies").textContent = navigator.cookieEnabled
+        ? "Ja ✅"
+        : "Nein ❌";
+      document.getElementById("origin").textContent =
+        window.location.hostname === "127.0.0.1"
+          ? "Ja ✅"
+          : "Nein ❌ (Hostname: " + window.location.hostname + ")";
+
+      const API_BASE = "http://127.0.0.1:3000/api";
+
+      function log(message, type = "info") {
+        const status = document.getElementById("status");
+        const div = document.createElement("div");
+        const time = new Date().toLocaleTimeString();
+        div.innerHTML = `<strong>[${time}]</strong> ${message}`;
+        if (type === "error") div.style.color = "red";
+        if (type === "success") div.style.color = "green";
+        status.appendChild(div);
+        status.scrollTop = status.scrollHeight;
+      }
+
+      function clearAll() {
+        document.getElementById("status").innerHTML = "";
+        // Versuche alle Cookies zu löschen
+        document.cookie.split(";").forEach(function (c) {
+          document.cookie = c
+            .replace(/^ +/, "")
+            .replace(
+              /=.*/,
+              "=;expires=" + new Date().toUTCString() + ";path=/"
+            );
+        });
+        log("🧹 Status und Cookies gelöscht");
+      }
+
+      // 1. Manueller Cookie-Test
+      function manualCookieTest() {
+        log("🧪 Teste manuelles Cookie-Setzen...");
+
+        // Test-Cookie setzen
+        const testValue = "test-" + Date.now();
+        document.cookie = `testCookie=${testValue}; path=/; max-age=3600`;
+
+        // Sofort prüfen
+        const cookies = document.cookie;
+        log(`Alle Cookies: ${cookies || "Keine"}`);
+
+        if (cookies.includes("testCookie")) {
+          log("✅ Manuelles Cookie-Setzen funktioniert!", "success");
+        } else {
+          log("❌ Manuelles Cookie-Setzen fehlgeschlagen!", "error");
+        }
+      }
+
+      // 2. API-Test mit Debug
+      async function apiTest() {
+        try {
+          log("🚀 Teste API-Gast-Session...");
+
+          // Request mit maximaler Debug-Info
+          const requestOptions = {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+
+          log(`Request URL: ${API_BASE}/session/guest`);
+          log(`Request Options: ${JSON.stringify(requestOptions, null, 2)}`);
+
+          const response = await fetch(
+            `${API_BASE}/session/guest`,
+            requestOptions
+          );
+
+          log(`Response Status: ${response.status} ${response.statusText}`);
+          log(`Response OK: ${response.ok}`);
+
+          // Alle Response Headers loggen (soweit möglich)
+          const headers = {};
+          for (let [key, value] of response.headers.entries()) {
+            headers[key] = value;
+          }
+          log(`Response Headers: ${JSON.stringify(headers, null, 2)}`);
+
+          const data = await response.json();
+          log(`Response Data: ${JSON.stringify(data, null, 2)}`);
+
+          if (response.ok) {
+            log("✅ API-Request erfolgreich!", "success");
+
+            // Sofort nach API-Call Cookies prüfen
+            setTimeout(() => {
+              const cookiesAfter = document.cookie;
+              log(`Cookies nach API-Call: ${cookiesAfter || "Keine"}`);
+
+              if (cookiesAfter.includes("guestId")) {
+                log("✅ guestId Cookie wurde gesetzt!", "success");
+              } else {
+                log("❌ guestId Cookie wurde NICHT gesetzt!", "error");
+              }
+            }, 100);
+          } else {
+            log(
+              `❌ API-Request fehlgeschlagen: ${data.error || "Unbekannt"}`,
+              "error"
+            );
+          }
+        } catch (error) {
+          log(`❌ Network Error: ${error.message}`, "error");
+          log(`Error Stack: ${error.stack}`);
+        }
+      }
+
+      // 3. Cookie-Status prüfen
+      function cookieInspect() {
+        log("🔍 Cookie-Inspektion...");
+
+        const allCookies = document.cookie;
+        log(`Alle Browser-Cookies: "${allCookies}"`);
+
+        if (!allCookies) {
+          log("ℹ️ Keine Cookies vorhanden");
+          return;
+        }
+
+        // Cookies aufteilen
+        const cookieArray = allCookies.split(";").map((c) => c.trim());
+        cookieArray.forEach((cookie) => {
+          const [name, value] = cookie.split("=");
+          log(`  Cookie: ${name} = ${value}`);
+        });
+
+        // Spezifisch nach guestId suchen
+        const guestId = getCookie("guestId");
+        if (guestId) {
+          log(`✅ guestId gefunden: ${guestId}`, "success");
+        } else {
+          log("❌ guestId nicht gefunden", "error");
+        }
+      }
+
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(";").shift();
+        return null;
+      }
+
+      // Initial-Log
+      log("🔧 Direkter Cookie-Test geladen");
+      log(`Browser: ${navigator.userAgent}`);
+      log(`Frontend Origin: ${window.location.origin}`);
+      log(`Backend Target: ${API_BASE}`);
+    </script>
+  </body>
+</html>

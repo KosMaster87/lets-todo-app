@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cookie-Test für Development</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ccc;
+      }
+      .success {
+        background-color: #d4edda;
+      }
+      .error {
+        background-color: #f8d7da;
+      }
+      button {
+        padding: 10px 15px;
+        margin: 5px;
+      }
+      #log {
+        background: #f8f9fa;
+        padding: 15px;
+        border: 1px solid #ddd;
+        height: 300px;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Cookie & CORS Test für 127.0.0.1</h1>
+
+    <div class="test-section">
+      <h3>Environment Info</h3>
+      <p><strong>Frontend:</strong> <span id="frontend-url"></span></p>
+      <p><strong>Backend API:</strong> <span id="backend-url"></span></p>
+      <p>
+        <strong>Cookies erlaubt:</strong> <span id="cookies-enabled"></span>
+      </p>
+    </div>
+
+    <div class="test-section">
+      <h3>Tests</h3>
+      <button onclick="testGuestSession()">Gast-Session erstellen</button>
+      <button onclick="testCookies()">Cookies prüfen</button>
+      <button onclick="testSessionValidation()">Session validieren</button>
+      <button onclick="clearLogs()">Logs leeren</button>
+    </div>
+
+    <div class="test-section">
+      <h3>Log</h3>
+      <div id="log"></div>
+    </div>
+
+    <script>
+      // Environment Info anzeigen
+      document.getElementById("frontend-url").textContent =
+        window.location.href;
+      document.getElementById("backend-url").textContent = "127.0.0.1:3000";
+      document.getElementById("cookies-enabled").textContent =
+        navigator.cookieEnabled ? "Ja" : "Nein";
+
+      const API_BASE = "http://127.0.0.1:3000/api";
+
+      function log(message, type = "info") {
+        const logDiv = document.getElementById("log");
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = document.createElement("div");
+        logEntry.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+        if (type === "error") logEntry.style.color = "red";
+        if (type === "success") logEntry.style.color = "green";
+        logDiv.appendChild(logEntry);
+        logDiv.scrollTop = logDiv.scrollHeight;
+      }
+
+      function clearLogs() {
+        document.getElementById("log").innerHTML = "";
+      }
+
+      async function testGuestSession() {
+        try {
+          log("🚀 Teste Gast-Session Erstellung...");
+
+          const response = await fetch(`${API_BASE}/session/guest`, {
+            method: "POST",
+            credentials: "include", // Wichtig für Cookies!
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            log(`✅ Gast-Session erstellt: ${data.guestId}`, "success");
+            log(`Message: ${data.message}`, "success");
+          } else {
+            log(`❌ Fehler: ${data.error || "Unbekannter Fehler"}`, "error");
+          }
+        } catch (error) {
+          log(`❌ Network Error: ${error.message}`, "error");
+        }
+      }
+
+      async function testCookies() {
+        log("🍪 Teste Cookie-Zugriff...");
+
+        // Alle Cookies anzeigen
+        const allCookies = document.cookie;
+        log(`Alle Cookies: ${allCookies || "Keine Cookies gefunden"}`);
+
+        // Spezifisch nach guestId suchen
+        const guestId = getCookie("guestId");
+        if (guestId) {
+          log(`✅ guestId Cookie gefunden: ${guestId}`, "success");
+        } else {
+          log(`❌ guestId Cookie nicht gefunden`, "error");
+        }
+      }
+
+      async function testSessionValidation() {
+        try {
+          log("🔍 Teste Session-Validierung...");
+
+          const response = await fetch(`${API_BASE}/session/validate`, {
+            method: "GET",
+            credentials: "include", // Wichtig für Cookies!
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            log(`✅ Session-Validierung erfolgreich:`, "success");
+            log(`Valid: ${data.valid}`);
+            if (data.type) log(`Type: ${data.type}`);
+            if (data.guestId) log(`Guest ID: ${data.guestId}`);
+          } else {
+            log(`❌ Session ungültig: ${data.error || data.message}`, "error");
+          }
+        } catch (error) {
+          log(`❌ Network Error: ${error.message}`, "error");
+        }
+      }
+
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(";").shift();
+        return null;
+      }
+
+      // Initial-Test beim Laden
+      log("🔧 Cookie-Test Page geladen");
+      log(`Frontend: ${window.location.origin}`);
+      log(`Backend: ${API_BASE}`);
+    </script>
+  </body>
+</html>
