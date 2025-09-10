@@ -1,20 +1,23 @@
-# RESTful Notes App - Frontend
+# Let's Todo App - Frontend
 
-Eine moderne Todo-App mit session```javascript
+## 📲 Eine moderne Todo-App mit session
+
+```javascript
 // 📦 app.js - NUR Koordination und Modus-Management
 function todoApp() {
-this.sessionManager = new SessionManager(); // Delegiert Session-Logik
-this.apiClient = new ApiClient(); // Delegiert API-Logik
+  this.sessionManager = new SessionManager(); // Delegiert Session-Logik
+  this.apiClient = new ApiClient(); // Delegiert API-Logik
 
-this.changeMode = function (mode) {
-this.mode = mode;
-this.buildUI(); // Koordiniert UI-Updates
-};
+  this.changeMode = function (mode) {
+    this.mode = mode;
+    this.buildUI(); // Koordiniert UI-Updates
+  };
 
-this.printModeContent = function () {
-UIRenderer.renderModeButtons(this.container, this.mode, this); // Delegiert UI-Rendering
-};
+  this.printModeContent = function () {
+    UIRenderer.renderModeButtons(this.container, this.mode, this); // Delegiert UI-Rendering
+  };
 }
+```
 
 // 📦 js/config/environment.js - NUR Environment-Management
 const CONFIG = {
@@ -39,32 +42,32 @@ this.validateSession = function (apiHandler) {…};fizierung, die sowohl User- a
 ## 🏗️ Projektstruktur
 
 ```
-restful-notes-user-session-frontend/
-├── index.html              # Haupt-HTML-Datei
-├── app.js                  # Hauptanwendung (todoApp Klasse)
-├── style.css              # Styling
-├── js/                    # JavaScript-Module
-│   ├── apiClient.js       # REST-API Kommunikation
-│   ├── sessionManager.js  # Session-Verwaltung
-│   ├── config/            # Environment-Konfiguration
-│   │   └── environment.js # Automatische API-URL Detection
-│   ├── handlers/          # Event-Handler
+lets-todo/
+├── index.html                # Haupt-HTML-Datei
+├── app.js                    # Hauptanwendung (todoApp Klasse)
+├── style.css                 # Styling
+├── js/                       # JavaScript-Module
+│   ├── apiClient.js          # REST-API Kommunikation
+│   ├── sessionManager.js     # Session-Verwaltung
+│   ├── config/               # Environment-Konfiguration
+│   │   └── environment.js    # Automatische API-URL Detection
+│   ├── handlers/             # Event-Handler
 │   │   └── eventHandlers.js
-│   ├── templates/         # HTML-Templates
+│   ├── templates/            # HTML-Templates
 │   │   └── htmlTemplates.js
-│   ├── ui/               # UI-Rendering
+│   ├── ui/                   # UI-Rendering
 │   │   └── uiRenderer.js
-│   └── utils/            # Hilfsfunktionen
+│   └── utils/                # Hilfsfunktionen
 │       └── formValidation.js
-├── test-cookies.html      # Cookie-Test für Development
-├── test-direct.html       # API-Test für Development
-└── assets/               # Statische Assets
+├── test-cookies.html         # Cookie-Test für Development
+├── test-direct.html          # API-Test für Development
+└── assets/                   # Statische Assets
     ├── favicon.png
-    ├── img/              # Icons
+    ├── img/                  # Icons
     │   ├── delete_note.svg
     │   └── edit_note.svg
-    ├── fonts/            # Custom Fonts
-    └── styles/           # Zusätzliche Stylesheets
+    ├── fonts/                # Custom Fonts
+    └── styles/               # Zusätzliche Stylesheets
         └── comic.css
 ```
 
@@ -236,7 +239,7 @@ if (ENV.DEBUG) {
 ## 📋 Voraussetzungen
 
 - Modern Web Browser (Chrome 60+, Firefox 55+, Safari 12+)
-- Backend-Server (siehe [Backend Repository](../restful-notes-user-session-backend) - Express.js API)
+- Backend-Server (siehe [Backend Repository](../lets-todo-api) - Express.js API)
 - **Development**: HTTP-Server (127.0.0.1) ausreichend
 - **Production**: HTTPS-Verbindung für Session-Cookies erforderlich
 
@@ -245,8 +248,8 @@ if (ENV.DEBUG) {
 ### 1. Repository klonen
 
 ```bash
-git clone https://github.com/KosMaster87/restful-notes-frontend.git
-cd restful-notes-frontend
+git clone https://github.com/KosMaster87/lets-todo-app.git
+cd lets-todo-app
 ```
 
 ### 2. Development Server starten
@@ -631,7 +634,7 @@ Bei Problemen:
 
 ### Browser-Kompatibilität
 
-| Browser | Version | Status         | Notes                     |
+| Browser | Version | Status         | Todos                     |
 | ------- | ------- | -------------- | ------------------------- |
 | Chrome  | 60+     | ✅ Vollständig | Empfohlen für Development |
 | Firefox | 55+     | ✅ Vollständig | Gute Alternative          |
@@ -663,41 +666,40 @@ Dieses Projekt steht unter der [MIT License](LICENSE).
 
 ## 🔗 Related Projects
 
-- [Backend Repository](../restful-notes-user-session-backend) - Express.js API Server
-- [Database Schema](../restful-notes-user-session-backend/README.md#database) - MariaDB Setup
+- [Backend Repository](../lets-todo-api) - Express.js API Server
+- [Database Schema](../lets-todo-api/README.md#database) - MariaDB Setup
 
 ## 📞 Support
 
 Bei Fragen oder Problemen:
 
-1. [Issues](https://github.com/KosMaster87/restful-notes-frontend/issues) erstellen
-2. [Discussions](https://github.com/KosMaster87/restful-notes-frontend/discussions) für Fragen
+1. [Issues](https://github.com/KosMaster87/lets-todo-app/issues) erstellen
+2. [Discussions](https://github.com/KosMaster87/lets-todo-app/discussions) für Fragen
 3. Code-Review via Pull Requests
-
-## 📚 Related Projects
 
 ### 🚀 Backend API
 
-**[RESTful Notes Backend →](../restful-notes-user-session-backend)**
+**[Let's Todo Backend →](../lets-todo-api)**
 
 - **Technologie**: Express.js mit ES6-Modulen, MariaDB
 - **Features**: Multi-Database-Architecture, Environment-Detection, Pool-Management
-- **API Documentation**: [Backend README](../restful-notes-user-session-backend/README.md)
+- **API Documentation**: [Backend README](../lets-todo-api/README.md)
 - **Development**: http://127.0.0.1:3000/api
 
 ### 📦 Full-Stack Development
 
 ```bash
 # Gesamtes Projekt einrichten
-git clone [main-repository]
-cd restful-notes-user-session-mariadb
+git clone https://github.com/KosMaster87/lets-todo-api.git
+git clone https://github.com/KosMaster87/lets-todo-app.git
+cd lets-todo
 
 # 1. Backend starten (Terminal 1)
-cd restful-notes-user-session-backend
+cd lets-todo-api
 npm install && npm run dev:db && npm run dev
 
 # 2. Frontend starten (Terminal 2)
-cd ../restful-notes-user-session-frontend
+cd ../lets-todo-app
 # VS Code Live Server: http://127.0.0.1:5501
 ```
 

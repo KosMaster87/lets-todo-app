@@ -1,9 +1,9 @@
-# Frontend Copilot Instructions - RESTful Notes App
+# Frontend Copilot Instructions - Let's Todo App
 
 ## Projektstruktur
 
 ```
-restful-notes-user-session-frontend/
+lets-todo-app/
 ├── index.html              # Haupt-HTML Datei
 ├── style.css              # Styling
 ├── app.js                 # Haupt-Anwendungslogik (todoApp Klasse)
