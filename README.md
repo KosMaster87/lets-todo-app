@@ -17,18 +17,27 @@ function todoApp() {
     UIRenderer.renderModeButtons(this.container, this.mode, this); // Delegiert UI-Rendering
   };
 }
-```
+
 
 // 📦 js/config/environment.js - NUR Environment-Management
 const CONFIG = {
 development: { API*BASE: "http://127.0.0.1:3000/api", DEBUG: true },
 production: { API_BASE: "https://lets-todo-api.dev2k.org/api", DEBUG: false }
 };
+
 function detectEnvironment() { /* Automatische Detection \_/ }
 
-// 📦 sessionManager.js - NUR Session-Verwaltung
+/**
+ * 📦 sessionManager.js - NUR Session-Verwaltung
+ * Fizierung, die sowohl User- als auch Gast-Sessions unterstützt.
+ * Das Frontend ist in Vanilla JavaScript entwickelt und kommuniziert über eine RESTful API mit dem Backend.
+ * @param {} -
+ * @returns {}
+ */
 function SessionManager() {
-this.validateSession = function (apiHandler) {…};fizierung, die sowohl User- als auch Gast-Sessions unterstützt. Das Frontend ist in Vanilla JavaScript entwickelt und kommuniziert über eine RESTful API mit dem Backend.
+this.validateSession = function (apiHandler) {…};
+};
+```
 
 ## 🚀 Features
 
