@@ -4,30 +4,30 @@
 
 ```
 lets-todo-app/
-├── index.html              # Haupt-HTML Datei
-├── style.css              # Styling
-├── app.js                 # Haupt-Anwendungslogik (todoApp Klasse)
+├── index.html                 # Haupt-HTML Datei
+├── style.css                  # Styling
+├── app.js                     # Haupt-Anwendungslogik (todoApp Klasse)
 ├── js/
-│   ├── apiClient.js       # REST-API Kommunikation
-│   ├── sessionManager.js  # Session-Management
-│   ├── config/            # Environment-Konfiguration
+│   ├── apiClient.js           # REST-API Kommunikation
+│   ├── sessionManager.js      # Session-Management
+│   ├── config/                # Environment-Konfiguration
 │   │   └── environment.js
-│   ├── handlers/          # Event-Handler
+│   ├── handlers/              # Event-Handler
 │   │   └── eventHandlers.js
-│   ├── templates/         # HTML-Templates
+│   ├── templates/             # HTML-Templates
 │   │   └── htmlTemplates.js
-│   ├── ui/               # UI-Rendering
+│   ├── ui/                    # UI-Rendering
 │   │   └── uiRenderer.js
-│   └── utils/            # Hilfsfunktionen
+│   └── utils/                 # Hilfsfunktionen
 │       └── formValidation.js
-├── test-cookies.html      # Cookie-Test für Development
-├── test-direct.html       # Direkter API-Test für Development
+├── test-cookies.html          # Cookie-Test für Development
+├── test-direct.html           # Direkter API-Test für Development
 └── assets/
     ├── favicon.png
-    ├── img/              # Icons (SVG)
+    ├── img/                   # Icons (SVG)
     │   ├── delete_note.svg
     │   └── edit_note.svg
-    └── styles/           # Zusätzliche Stylesheets
+    └── styles/                # Zusätzliche Stylesheets
         └── comic.css
 ```
 
