@@ -6,6 +6,7 @@
     <!-- <base href="/lets-todo-app/" /> -->
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="assets/styles/comic.css" />
+    <link rel="stylesheet" href="src/styles/components.css" />
     <link
       rel="icon"
       type="image/png"
@@ -22,10 +23,701 @@
     <title>Let's Todo</title>
   </head>
   <body>
-    <div class="container">
-      <h1>Let's Todo</h1>
-      <div class="content" id="content"></div>
+    <div class="main-container">
+      <header class="app-header">
+        <h1>Let's Todo App</h1>
+        <p class="subtitle">Deine Todos, überall verfügbar</p>
+      </header>
+
+      <!-- ----- Main Menu Start ----- -->
+      <main class="main-menu-wrapper" data-view="main-menu">
+        <section class="main-menu-intro">
+          <h2>Willkommen!</h2>
+          <p>Hier hast du die erste Übersicht deiner Möglichkeiten</p>
+        </section>
+
+        <nav class="main-menu">
+          <button class="menu-btn guest-btn" id="guestBtn">
+            <div class="btn-icon guest-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Gast-Sitzung</h3>
+              <p>Sofort loslegen ohne Registrierung</p>
+            </div>
+          </button>
+
+          <button class="menu-btn register-btn" id="registerBtn">
+            <div class="btn-icon register-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Registrieren</h3>
+              <p>Neues Konto erstellen</p>
+            </div>
+          </button>
+
+          <button class="menu-btn login-btn" id="loginBtn">
+            <div class="btn-icon login-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Anmelden</h3>
+              <p>Mit bestehendem Konto einloggen</p>
+            </div>
+          </button>
+
+          <button class="menu-btn option-btn" id="optionBtn">
+            <div class="btn-icon option-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Optionen</h3>
+              <p>Benutzereinstellungen verwalten</p>
+            </div>
+          </button>
+        </nav>
+      </main>
+      <!-- ----- Main Menu End ----- -->
+
+      <!-- ----- Register Form Start ----- -->
+      <main class="register-wrapper hidden" data-view="register">
+        <section class="register-intro">
+          <h2>Registriere dich jetzt</h2>
+          <p>
+            Erstelle ein kostenloses Konto, um deine Todos sicher zu speichern
+            und von überall darauf zuzugreifen.
+          </p>
+        </section>
+
+        <nav class="register-menu">
+          <div class="form-group">
+            <label for="registerEmail">E-Mail-Adresse</label>
+            <input
+              type="email"
+              id="registerEmail"
+              name="email"
+              placeholder="E-Mail-Adresse"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="registerPassword">Passwort</label>
+            <input
+              type="password"
+              id="registerPassword"
+              name="password"
+              placeholder="Passwort (mindestens 6 Zeichen)"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="registerPasswordConfirm">Passwort bestätigen</label>
+            <input
+              type="password"
+              id="registerPasswordConfirm"
+              name="passwordConfirm"
+              placeholder="Passwort wiederholen"
+              required
+            />
+          </div>
+
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="registerTerms" name="terms" required />
+            <label for="registerTerms"
+              >Ich akzeptiere die Nutzungsbedingungen</label
+            >
+          </div>
+
+          <button class="menu-btn registerSubmit-btn" id="registerSubmitBtn">
+            <div class="btn-icon registerSubmit-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Registrieren</h3>
+              <p>Neues Konto erstellen</p>
+            </div>
+          </button>
+
+          <button class="menu-btn registerCancel-btn" id="registerCancelBtn">
+            <div class="btn-icon registerCancel-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Abbrechen</h3>
+              <p>Zurück zur Hauptseite</p>
+            </div>
+          </button>
+        </nav>
+      </main>
+      <!-- ----- Register Form End ----- -->
+
+      <!-- ----- Login Form Start ----- -->
+      <main class="login-wrapper hidden" data-view="login">
+        <section class="login-intro">
+          <h2>Willkommen zurück!</h2>
+          <p>Bitte melde dich an, um auf deine Todos zuzugreifen.</p>
+        </section>
+
+        <nav class="login-menu">
+          <div class="form-group">
+            <label for="loginEmail">E-Mail-Adresse</label>
+            <input
+              type="email"
+              id="loginEmail"
+              name="email"
+              placeholder="E-Mail-Adresse"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="loginPassword">Passwort</label>
+            <input
+              type="password"
+              id="loginPassword"
+              name="password"
+              placeholder="Passwort"
+              required
+            />
+          </div>
+
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="loginRemember" name="remember" />
+            <label for="loginRemember">Angemeldet bleiben</label>
+          </div>
+
+          <button class="menu-btn loginSubmit-btn" id="loginSubmitBtn">
+            <div class="btn-icon loginSubmit-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Anmelden</h3>
+              <p>In dein Konto einloggen</p>
+            </div>
+          </button>
+
+          <button class="menu-btn loginCancel-btn" id="loginCancelBtn">
+            <div class="btn-icon loginCancel-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Abbrechen</h3>
+              <p>Zurück zur Hauptseite</p>
+            </div>
+          </button>
+        </nav>
+      </main>
+      <!-- ----- Login Form End ----- -->
+
+      <!-- ----- Options Menu Start ----- -->
+      <main class="options-wrapper hidden" data-view="options">
+        <section class="options-intro">
+          <h2>Einstellungen</h2>
+          <p>
+            Verwalte deine Benutzereinstellungen und personalisiere deine
+            Erfahrung.
+          </p>
+        </section>
+
+        <nav class="options-menu">
+          <button class="menu-btn theme-toggle-btn" id="themeToggleBtn">
+            <div class="btn-icon theme-toggle-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Dark/Light Mode</h3>
+              <p>Zwischen hellem und dunklem Design wechseln</p>
+            </div>
+          </button>
+
+          <button class="menu-btn personal-data-btn" id="personalDataBtn">
+            <div class="btn-icon personal-data-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Persönliche Daten</h3>
+              <p>Deine Kontoinformationen bearbeiten</p>
+            </div>
+          </button>
+
+          <button class="menu-btn optionsCancel-btn" id="optionsCancelBtn">
+            <div class="btn-icon optionsCancel-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Zurück</h3>
+              <p>Zurück zum Hauptmenü</p>
+            </div>
+          </button>
+        </nav>
+      </main>
+      <!-- ----- Options Menu End ----- -->
+
+      <!-- ----- Personal Data Menu Start ----- -->
+      <main class="personal-data-wrapper hidden" data-view="personal-data">
+        <section class="personal-data-intro">
+          <h2>Persönliche Daten</h2>
+          <p>
+            Verwalte deine Kontoinformationen und ändere dein Passwort für mehr
+            Sicherheit.
+          </p>
+        </section>
+
+        <nav class="personal-data-menu">
+          <button class="menu-btn reset-password-btn" id="resetPasswordBtn">
+            <div class="btn-icon reset-password-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Passwort zurücksetzen</h3>
+              <p>Passwort über E-Mail zurücksetzen</p>
+            </div>
+          </button>
+
+          <button class="menu-btn download-notes-btn" id="downloadNotesBtn">
+            <div class="btn-icon download-notes-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Todos herunterladen</h3>
+              <p>Alle deine Todos als Datei speichern</p>
+            </div>
+          </button>
+
+          <button class="menu-btn upload-notes-btn" id="uploadNotesBtn">
+            <div class="btn-icon upload-notes-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Todos wiederherstellen</h3>
+              <p>Todos aus einer Datei importieren</p>
+            </div>
+          </button>
+
+          <button
+            class="menu-btn personalDataCancel-btn"
+            id="personalDataCancelBtn"
+          >
+            <div class="btn-icon personalDataCancel-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Zurück</h3>
+              <p>Zurück zu den Einstellungen</p>
+            </div>
+          </button>
+        </nav>
+      </main>
+      <!-- ----- Personal Data Menu End ----- -->
+
+      <!-- ----- Change Password Menu Start ----- -->
+      <main class="change-password-wrapper hidden" data-view="change-password">
+        <section class="change-password-intro">
+          <h2>Passwort ändern</h2>
+          <p>
+            Gib dein aktuelles Passwort ein und wähle ein neues, sicheres
+            Passwort für dein Konto.
+          </p>
+        </section>
+
+        <nav class="change-password-menu">
+          <div class="form-group">
+            <label for="currentPassword">Aktuelles Passwort</label>
+            <input
+              type="password"
+              id="currentPassword"
+              name="currentPassword"
+              placeholder="Dein aktuelles Passwort"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">Neues Passwort</label>
+            <input
+              type="password"
+              id="newPassword"
+              name="newPassword"
+              placeholder="Neues Passwort"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Passwort bestätigen</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              placeholder="Neues Passwort bestätigen"
+              required
+            />
+          </div>
+
+          <button
+            class="menu-btn changePasswordSubmit-btn"
+            id="changePasswordSubmitBtn"
+          >
+            <div class="btn-icon changePasswordSubmit-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Passwort speichern</h3>
+              <p>Neues Passwort übernehmen</p>
+            </div>
+          </button>
+
+          <button
+            class="menu-btn changePasswordCancel-btn"
+            id="changePasswordCancelBtn"
+          >
+            <div class="btn-icon changePasswordCancel-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Abbrechen</h3>
+              <p>Zurück zu persönlichen Daten</p>
+            </div>
+          </button>
+        </nav>
+      </main>
+      <!-- ----- Change Password Menu End ----- -->
+
+      <!-- ----- Trash Menu Start ----- -->
+      <main class="trash-wrapper hidden" data-view="trash">
+        <section class="trash-intro">
+          <h2>Papierkorb</h2>
+          <p>
+            Hier findest du alle gelöschten Todos. Du kannst sie
+            wiederherstellen oder endgültig löschen.
+          </p>
+        </section>
+
+        <nav class="trash-menu">
+          <button class="menu-btn empty-trash-btn" id="emptyTrashBtn">
+            <div class="btn-icon empty-trash-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Papierkorb leeren</h3>
+              <p>Alle gelöschten Todos endgültig entfernen</p>
+            </div>
+          </button>
+
+          <button class="menu-btn trash-filter-btn" id="trashFilterBtn">
+            <div class="btn-icon trash-filter-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Filter</h3>
+              <p>Gelöschte Todos filtern und sortieren</p>
+            </div>
+          </button>
+
+          <button class="menu-btn trashCancel-btn" id="trashCancelBtn">
+            <div class="btn-icon trashCancel-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Zurück</h3>
+              <p>Zurück zum Dashboard</p>
+            </div>
+          </button>
+        </nav>
+
+        <section class="trash-notes-container">
+          <h3>Gelöschte Todos</h3>
+          <div class="trash-notes-list">
+            <!-- Hier werden die gelöschten Todos dynamisch eingefügt -->
+            <div class="trash-note-placeholder">
+              <p>Keine gelöschten Todos vorhanden</p>
+            </div>
+          </div>
+        </section>
+      </main>
+      <!-- ----- Trash Menu End ----- -->
+
+      <!-- ----- Notes Menu Start ----- -->
+      <main class="notes-wrapper hidden" data-view="notes">
+        <section class="notes-intro">
+          <h2>Todo erstellen/bearbeiten</h2>
+          <p>
+            Erstelle und bearbeite deine Todos. Organisiere sie mit Prioritäten
+            und verwalte deinen Fortschritt.
+          </p>
+        </section>
+
+        <nav class="notes-menu">
+          <button class="menu-btn notesCancel-btn" id="notesCancelBtn">
+            <div class="btn-icon notesCancel-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Zurück zum Dashboard</h3>
+              <p>Zurück zur Hauptseite</p>
+            </div>
+          </button>
+
+          <button class="menu-btn notesSave-btn" id="notesSaveBtn">
+            <div class="btn-icon notesSave-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Todo speichern</h3>
+              <p>Dein Todo sichern</p>
+            </div>
+          </button>
+        </nav>
+
+        <section class="note-creation">
+          <div class="note-form">
+            <div class="form-group">
+              <label for="noteTitle">Titel</label>
+              <input
+                type="text"
+                id="noteTitle"
+                name="title"
+                placeholder="Titel deines Todos"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="noteContent">Beschreibung</label>
+              <textarea
+                id="noteContent"
+                name="content"
+                placeholder="Schreibe hier deine Todo-Beschreibung..."
+                rows="6"
+                required
+              ></textarea>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <input type="checkbox" id="noteCompleted" name="completed" />
+              <label for="noteCompleted">Als erledigt markieren</label>
+            </div>
+
+            <div class="note-actions">
+              <button
+                class="action-btn bookmark-btn"
+                id="bookmarkBtn"
+                title="Als wichtig markieren"
+              >
+                <div class="action-icon bookmark-icon"></div>
+              </button>
+
+              <button
+                class="action-btn save-note-btn"
+                id="saveNoteBtn"
+                title="Todo speichern"
+              >
+                <div class="action-icon save-note-icon"></div>
+              </button>
+
+              <button
+                class="action-btn share-btn"
+                id="shareBtn"
+                title="Todo teilen"
+              >
+                <div class="action-icon share-icon"></div>
+              </button>
+
+              <button
+                class="action-btn copy-btn"
+                id="copyBtn"
+                title="Todo kopieren"
+              >
+                <div class="action-icon copy-icon"></div>
+              </button>
+
+              <button
+                class="action-btn delete-note-btn"
+                id="deleteNoteBtn"
+                title="Todo löschen"
+              >
+                <div class="action-icon delete-note-icon"></div>
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+      <!-- ----- Notes Menu End ----- -->
+
+      <!-- ----- Notes List Menu Start ----- -->
+      <main class="notes-list-wrapper hidden" data-view="notes-list">
+        <section class="notes-list-intro">
+          <h2>Deine Todos</h2>
+          <p>
+            Hier findest du alle deine gespeicherten Todos. Verwalte sie,
+            bearbeite sie oder erstelle neue.
+          </p>
+        </section>
+
+        <nav class="notes-list-menu">
+          <button
+            class="menu-btn notes-list-filter-btn"
+            id="notesListFilterBtn"
+          >
+            <div class="btn-icon notes-list-filter-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Filter & Sortierung</h3>
+              <p>Todos filtern und sortieren</p>
+            </div>
+          </button>
+
+          <button class="menu-btn notesListCancel-btn" id="notesListCancelBtn">
+            <div class="btn-icon notesListCancel-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Zurück zum Dashboard</h3>
+              <p>Zurück zur Hauptseite</p>
+            </div>
+          </button>
+        </nav>
+
+        <section class="notes-list-container">
+          <h3>Gespeicherte Todos</h3>
+          <div class="notes-list">
+            <!-- Hier werden die Todos dynamisch eingefügt -->
+            <div class="note-placeholder">
+              <p>Noch keine Todos vorhanden. Erstelle dein erstes Todo!</p>
+            </div>
+          </div>
+        </section>
+      </main>
+      <!-- ----- Notes List Menu End ----- -->
+
+      <!-- ----- Note View Menu Start ----- -->
+      <main class="note-view-wrapper hidden" data-view="note-view">
+        <section class="note-view-intro">
+          <h2>Todo Details</h2>
+          <p>
+            Hier siehst du dein Todo im Detail. Du kannst es bearbeiten, teilen
+            oder löschen.
+          </p>
+        </section>
+
+        <nav class="note-view-menu">
+          <button class="menu-btn noteViewBack-btn" id="noteViewBackBtn">
+            <div class="btn-icon noteViewBack-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Zurück zu Todos</h3>
+              <p>Zur Todo-Liste zurückkehren</p>
+            </div>
+          </button>
+
+          <button class="menu-btn noteViewSave-btn" id="noteViewSaveBtn">
+            <div class="btn-icon noteViewSave-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Todo speichern</h3>
+              <p>Änderungen speichern</p>
+            </div>
+          </button>
+        </nav>
+
+        <section class="note-display">
+          <div class="note-header">
+            <h3 id="noteDisplayTitle">Titel des Todos</h3>
+            <span class="note-status" id="noteDisplayStatus">Offen</span>
+          </div>
+
+          <div class="note-content-display" id="noteContentDisplay">
+            <p>Hier wird der Inhalt des Todos angezeigt...</p>
+          </div>
+
+          <div class="note-view-actions">
+            <button
+              class="action-btn bookmark-view-btn"
+              id="bookmarkViewBtn"
+              title="Wichtigkeit umschalten"
+            >
+              <div class="action-icon bookmark-view-icon"></div>
+            </button>
+
+            <button
+              class="action-btn edit-note-btn"
+              id="editNoteBtn"
+              title="Todo bearbeiten"
+            >
+              <div class="action-icon edit-note-icon"></div>
+            </button>
+
+            <button
+              class="action-btn share-note-btn"
+              id="shareNoteBtn"
+              title="Todo teilen"
+            >
+              <div class="action-icon share-note-icon"></div>
+            </button>
+
+            <button
+              class="action-btn copy-note-btn"
+              id="copyNoteBtn"
+              title="Todo kopieren"
+            >
+              <div class="action-icon copy-note-icon"></div>
+            </button>
+
+            <button
+              class="action-btn delete-view-note-btn"
+              id="deleteViewNoteBtn"
+              title="Todo löschen"
+            >
+              <div class="action-icon delete-view-note-icon"></div>
+            </button>
+          </div>
+        </section>
+      </main>
+      <!-- ----- Note View Menu End ----- -->
+
+      <!-- ----- User Dashboard Menu Start ----- -->
+      <main class="dashboard-wrapper hidden" data-view="dashboard">
+        <section class="dashboard-intro">
+          <h2>Dashboard</h2>
+          <p>
+            Willkommen in deiner Todo-Übersicht. Hier findest du alle wichtigen
+            Funktionen für deine Todos.
+          </p>
+        </section>
+
+        <nav class="dashboard-menu">
+          <button
+            class="menu-btn notes-list-dashboard-btn"
+            id="notesListDashboardBtn"
+          >
+            <div class="btn-icon notes-list-dashboard-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Todo-Liste</h3>
+              <p>Alle deine gespeicherten Todos anzeigen</p>
+            </div>
+          </button>
+
+          <button
+            class="menu-btn create-note-dashboard-btn"
+            id="createNoteDashboardBtn"
+          >
+            <div class="btn-icon create-note-dashboard-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Todo erstellen</h3>
+              <p>Ein neues Todo schreiben</p>
+            </div>
+          </button>
+
+          <button class="menu-btn trash-dashboard-btn" id="trashDashboardBtn">
+            <div class="btn-icon trash-dashboard-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Papierkorb</h3>
+              <p>Gelöschte Todos verwalten</p>
+            </div>
+          </button>
+
+          <button class="menu-btn dashboardCancel-btn" id="dashboardCancelBtn">
+            <div class="btn-icon dashboardCancel-btn-icon"></div>
+            <div class="btn-content">
+              <h3>Zurück zum Menü</h3>
+              <p>Zum Hauptmenü zurückkehren</p>
+            </div>
+          </button>
+        </nav>
+
+        <!-- Dashboard Stats -->
+        <section class="dashboard-stats">
+          <div class="stat-item">
+            <div class="stat-number dashboard-total-notes">0</div>
+            <div class="stat-label">Todos gesamt</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number dashboard-completed-notes">0</div>
+            <div class="stat-label">Erledigt</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number dashboard-trash-count">0</div>
+            <div class="stat-label">Im Papierkorb</div>
+          </div>
+        </section>
+      </main>
+      <!-- ----- User Dashboard Menu End ----- -->
+
+      <footer class="app-footer">
+        <p>&copy; 2025 Let's Todo App</p>
+      </footer>
     </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+      <div class="loading-spinner"></div>
+      <p>Lädt...</p>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Core State Management -->
+    <!-- Core utilities first -->
+    <script src="src/utils/ui-utils.js"></script>
+    <script src="src/utils/data-utils.js"></script>
+    <script src="src/services/service-registry.js"></script>
+
+    <!-- Legacy modules (must be loaded before new modular app) -->
     <script src="js/config/environment.js"></script>
     <script src="js/utils/formValidation.js"></script>
     <script src="js/templates/htmlTemplates.js"></script>
@@ -33,6 +725,21 @@
     <script src="js/ui/uiRenderer.js"></script>
     <script src="js/sessionManager.js"></script>
     <script src="js/apiClient.js"></script>
-    <script src="app.js"></script>
+
+    <!-- Core app state and services -->
+    <script src="js/state/appState.js"></script>
+    <script src="js/services/todoService.js"></script>
+
+    <!-- Modular View Components -->
+    <script src="src/components/views/main-menu.js"></script>
+    <script src="src/components/views/auth-view.js"></script>
+    <script src="src/components/views/dashboard-view.js"></script>
+    <script src="src/components/views/notes-view.js"></script>
+    <script src="src/components/views/settings-view.js"></script>
+    <script src="src/components/views/trash-view.js"></script>
+    <script src="src/components/enhanced-view-manager.js"></script>
+
+    <!-- Main Modular App (loads last) -->
+    <script src="src/app.js"></script>
   </body>
 </html>

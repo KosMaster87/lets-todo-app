@@ -1,0 +1,492 @@
+/* ===== ENHANCED STYLING FOR MODULAR COMPONENTS ===== */
+
+/* Hidden utility class */
+.hidden {
+  display: none !important;
+}
+
+/* Loading Overlay Styles */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  color: white;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #2196f3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Toast Notification Styles */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 300px;
+}
+
+.toast {
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease-out;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.toast.success {
+  background: linear-gradient(135deg, #4caf50, #45a049);
+}
+
+.toast.error {
+  background: linear-gradient(135deg, #f44336, #d32f2f);
+}
+
+.toast.warning {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+}
+
+.toast.info {
+  background: linear-gradient(135deg, #2196f3, #1976d2);
+}
+
+.toast::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.3);
+  animation: progress 5s linear forwards;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* Dashboard Stats Styles */
+.dashboard-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+}
+
+.stat-item {
+  text-align: center;
+  color: white;
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #4caf50;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.dashboard-progress {
+  text-align: center;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.dashboard-progress.empty {
+  background: rgba(255, 152, 0, 0.2);
+  color: #ff9800;
+}
+
+.dashboard-progress.complete {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+}
+
+.dashboard-progress.progress {
+  background: rgba(33, 150, 243, 0.2);
+  color: #2196f3;
+}
+
+/* Todo Item Styles for Lists */
+.todo-item {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.todo-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.todo-item.completed {
+  opacity: 0.7;
+}
+
+.todo-item.completed .todo-title {
+  text-decoration: line-through;
+}
+
+.todo-content {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.todo-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: #333;
+}
+
+.todo-description {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.todo-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+}
+
+.todo-date {
+  color: #999;
+}
+
+.todo-status {
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.todo-status.completed {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+}
+
+.todo-status.open {
+  background: rgba(255, 152, 0, 0.2);
+  color: #ff9800;
+}
+
+.todo-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Action Button Styles (Updated) */
+.action-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 2.2rem;
+  height: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+.action-btn.view-btn:hover {
+  background: rgba(33, 150, 243, 0.1);
+}
+
+.action-btn.edit-btn:hover {
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.action-btn.delete-btn:hover {
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.action-btn.toggle-btn:hover {
+  background: rgba(255, 193, 7, 0.1);
+}
+
+/* Trash-specific styles */
+.trash-todo-item {
+  background: rgba(255, 255, 255, 0.8);
+  border-left: 4px solid #f44336;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(244, 67, 54, 0.1);
+}
+
+.trash-todo-content {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.trash-todo-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 0.3rem;
+}
+
+.trash-todo-description {
+  font-size: 0.85rem;
+  color: #999;
+  margin-bottom: 0.5rem;
+}
+
+.trash-todo-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.75rem;
+}
+
+.trash-date {
+  color: #f44336;
+}
+
+.trash-age {
+  color: #999;
+}
+
+.trash-stats-container {
+  margin-bottom: 2rem;
+}
+
+.trash-stats {
+  display: flex;
+  justify-content: space-around;
+  background: rgba(244, 67, 54, 0.1);
+  border-radius: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(244, 67, 54, 0.2);
+}
+
+/* Guest mode indicator */
+.guest-mode-indicator {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 152, 0, 0.9);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  z-index: 1000;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Form validation styles */
+.form-group input.invalid {
+  border-color: #f44336 !important;
+  box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2) !important;
+}
+
+.form-group input.valid {
+  border-color: #4caf50 !important;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2) !important;
+}
+
+.form-error {
+  color: #f44336;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+}
+
+.form-success {
+  color: #4caf50;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+}
+
+/* Dark theme support */
+[data-theme="dark"] {
+  --primary-bg: #1a1a1a;
+  --secondary-bg: #2a2a2a;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+}
+
+[data-theme="dark"] body {
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+}
+
+[data-theme="dark"] .menu-btn {
+  background: var(--secondary-bg);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .btn-content h3,
+[data-theme="dark"] .btn-content p {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .todo-item {
+  background: var(--secondary-bg);
+}
+
+[data-theme="dark"] .todo-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .todo-description {
+  color: var(--text-secondary);
+}
+
+/* Responsive improvements */
+@media (max-width: 280px) {
+  .main-container {
+    max-width: 260px;
+    padding: 0.8rem 0.3rem;
+  }
+
+  .menu-btn {
+    height: 4rem;
+    padding: 0.3rem;
+  }
+
+  .btn-content h3 {
+    font-size: 1rem;
+  }
+
+  .btn-content p {
+    font-size: 0.7rem;
+  }
+}
+
+/* Animation utilities */
+.fade-in {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Focus styles for accessibility */
+.menu-btn:focus,
+.action-btn:focus,
+input:focus,
+textarea:focus,
+button:focus {
+  outline: 2px solid #2196f3;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .menu-btn {
+    border: 2px solid #000;
+  }
+
+  .action-btn {
+    border: 1px solid #000;
+  }
+}

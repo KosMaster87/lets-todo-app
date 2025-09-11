@@ -1,84 +1,131 @@
 # Let's Todo App - Frontend
 
-## 📲 Eine moderne Todo-App mit session
+## 📲 Eine moderne Todo-App mit State Management
 
 ```javascript
-// 📦 app.js - NUR Koordination und Modus-Management
+// 📦 app.js - State-basierte Koordination
 function todoApp() {
-  this.sessionManager = new SessionManager(); // Delegiert Session-Logik
-  this.apiClient = new ApiClient(); // Delegiert API-Logik
+  this.appState = new AppState(); // Zentraler State
+  this.viewManager = new ViewManager(); // Multi-View Navigation
+  this.todoService = new TodoService(); // Smart Caching & APIs
+  this.sessionManager = new SessionManager(); // Session-Logik
 
-  this.changeMode = function (mode) {
-    this.mode = mode;
-    this.buildUI(); // Koordiniert UI-Updates
+  // State-driven UI Updates
+  this.appState.subscribe(({ changedKeys }) => {
+    if (changedKeys.includes("currentView")) {
+      this.viewManager.showView(this.appState.getState().currentView);
+    }
+  });
+}
+
+// 📦 js/state/appState.js - Central State Management
+function AppState() {
+  this.state = {
+    currentView: "main-menu",
+    sessionType: null,
+    todos: [],
+    loading: false,
+    // ...
   };
 
-  this.printModeContent = function () {
-    UIRenderer.renderModeButtons(this.container, this.mode, this); // Delegiert UI-Rendering
+  this.setState = function (newState) {
+    /* Notify subscribers */
   };
 }
 
+// 📦 js/views/viewManager.js - Multi-View Navigation
+function ViewManager(appState) {
+  this.showView = function (viewName) {
+    /* Handle 12 different views */
+  };
+}
 
-// 📦 js/config/environment.js - NUR Environment-Management
-const CONFIG = {
-development: { API*BASE: "http://127.0.0.1:3000/api", DEBUG: true },
-production: { API_BASE: "https://lets-todo-api.dev2k.org/api", DEBUG: false }
-};
-
-function detectEnvironment() { /* Automatische Detection \_/ }
-
-/**
- * 📦 sessionManager.js - NUR Session-Verwaltung
- * Fizierung, die sowohl User- als auch Gast-Sessions unterstützt.
- * Das Frontend ist in Vanilla JavaScript entwickelt und kommuniziert über eine RESTful API mit dem Backend.
- * @param {} -
- * @returns {}
- */
-function SessionManager() {
-this.validateSession = function (apiHandler) {…};
-};
+// 📦 js/services/todoService.js - Smart API with Caching
+function TodoService(apiClient, appState) {
+  this.loadTodos = function (forceReload = false) {
+    // Return cached data if available
+    const todos = this.appState.getState().todos;
+    if (!forceReload && todos.length > 0) {
+      return Promise.resolve(todos); // ← No API call!
+    }
+    // ... API call only when needed
+  };
+}
 ```
 
 ## 🚀 Features
 
-- **Session-Management**: User-Login und Gast-Sessions
-- **RESTful API Integration**: Vollständige CRUD-Operationen für Todos
-- **Responsive Design**: Mobile-friendly Interface
-- **Real-time Updates**: Direkte API-Synchronisation
-- **Form Validation**: Live-Validierung mit User-Feedback
-- **Modular Architecture**: Saubere Trennung von Logik und Presentation
+- **🏪 Central State Management**: Reaktive State-Updates ohne Redundanz
+- **🔄 Smart Caching**: API-Calls nur wenn nötig - bessere Performance
+- **📱 Multi-View Architecture**: 12 verschiedene Views nahtlos navigierbar
+- **⚡ Optimistic Updates**: UI reagiert sofort, API folgt asynchron
+- **� Session-Management**: User-Login und Gast-Sessions
+- **🌙 Theme Support**: Light/Dark Mode umschaltbar
+- **📬 Toast Notifications**: User-Feedback für alle Aktionen
+- **🗑️ Trash Functionality**: Gelöschte Todos wiederherstellbar
+- **🔍 Advanced Filtering**: Sortierung und Suche in Todos
+- **📱 Responsive Design**: Mobile-first Design-Ansatz
 
-## 🏗️ Projektstruktur
+## 🏗️ Neue Projektstruktur (State Management)
 
 ```
-lets-todo/
-├── index.html                # Haupt-HTML-Datei
-├── app.js                    # Hauptanwendung (todoApp Klasse)
-├── style.css                 # Styling
-├── js/                       # JavaScript-Module
-│   ├── apiClient.js          # REST-API Kommunikation
-│   ├── sessionManager.js     # Session-Verwaltung
-│   ├── config/               # Environment-Konfiguration
-│   │   └── environment.js    # Automatische API-URL Detection
-│   ├── handlers/             # Event-Handler
-│   │   └── eventHandlers.js
-│   ├── templates/            # HTML-Templates
-│   │   └── htmlTemplates.js
-│   ├── ui/                   # UI-Rendering
-│   │   └── uiRenderer.js
-│   └── utils/                # Hilfsfunktionen
-│       └── formValidation.js
-├── test-cookies.html         # Cookie-Test für Development
-├── test-direct.html          # API-Test für Development
-└── assets/                   # Statische Assets
-    ├── favicon.png
-    ├── img/                  # Icons
-    │   ├── delete_note.svg
-    │   └── edit_note.svg
-    ├── fonts/                # Custom Fonts
-    └── styles/               # Zusätzliche Stylesheets
-        └── comic.css
+lets-todo-app/
+├── index.html                 # Haupt-HTML mit 12 View-Sections
+├── app.js                     # Refactored: State-basierte App-Koordination
+├── style.css                  # Globale Styles
+├── js/
+│   ├── state/                 # 🆕 State Management
+│   │   └── appState.js        # Central Application State
+│   ├── views/                 # 🆕 View Management
+│   │   └── viewManager.js     # Multi-View Navigation Logic
+│   ├── services/              # 🆕 Service Layer
+│   │   └── todoService.js     # Todo Operations with Smart Caching
+│   ├── config/
+│   │   └── environment.js     # Environment Configuration
+│   ├── handlers/
+│   │   └── eventHandlers.js   # Enhanced Event Handling
+│   ├── templates/
+│   │   └── htmlTemplates.js   # HTML Template Functions
+│   ├── ui/
+│   │   └── uiRenderer.js      # UI Rendering Logic
+│   ├── utils/
+│   │   └── formValidation.js  # Form Validation Utilities
+│   ├── sessionManager.js      # Session Management
+│   └── apiClient.js           # HTTP API Client
+├── assets/
+│   ├── favicon.png
+│   ├── fonts/comic/           # Comic Neue Font Files
+│   ├── img/                   # SVG Icons
+│   └── styles/
+│       └── comic.css          # Typography Styles
+└── docs/                      # Documentation
+    ├── TODO.md                # Development Roadmap
+    ├── README.md              # This file
+    └── copilot-instructions.md # AI Assistant Guidelines
 ```
+
+## � State Management Architektur
+
+### Central State (`appState.js`)
+
+- **Reactive Updates**: Automatische UI-Updates bei State-Änderungen
+- **Subscriber Pattern**: Components abonnieren relevante State-Änderungen
+- **Immutable Updates**: State wird niemals direkt mutiert
+- **Error Handling**: Globale Fehlerbehandlung über State
+
+### View Management (`viewManager.js`)
+
+- **12 Different Views**: main-menu, register, login, options, personal-data, change-password, trash, notes, notes-list, note-view, dashboard
+- **Smart View Initialization**: Jede View wird intelligent initialisiert
+- **Navigation History**: Zurück-Navigation über View-History
+- **Loading States**: Automatische Loading-Overlays
+
+### Service Layer (`todoService.js`)
+
+- **Smart Caching**: API-Calls nur wenn Daten nicht im State vorhanden
+- **Optimistic Updates**: UI reagiert sofort, API-Call folgt asynchron
+- **Error Recovery**: Automatic Rollback bei API-Fehlern
+- **Toast Notifications**: User-Feedback für alle Operationen
 
 ## 🛠️ Technologie-Stack
 

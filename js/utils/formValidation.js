@@ -39,7 +39,10 @@ function validateEmail(email) {
  */
 function validatePassword(password) {
   if (password.length < 6) {
-    return { valid: false, message: "Passwort muss mindestens 6 Zeichen haben" };
+    return {
+      valid: false,
+      message: "Passwort muss mindestens 6 Zeichen haben",
+    };
   }
   if (password.length > 128) {
     return { valid: false, message: "Passwort ist zu lang (max. 128 Zeichen)" };

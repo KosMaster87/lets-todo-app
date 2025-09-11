@@ -9,201 +9,1174 @@
 
 body {
   font-family: "Comic Neue", cursive;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  background-color: #737373;
-  flex-direction: column;
-  overflow-x: hidden;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
 }
 
-.content {
+.main-container {
+  /* height: 100dvh; */
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+  padding: 1rem 0.5rem;
   display: flex;
-  justify-content: center;
-  /* align-items: flex-start; */
   flex-direction: column;
-  margin-top: 2rem;
-  padding: 1rem;
-  border: 2px solid black;
-  border-radius: 1rem;
-  background-color: rgb(170, 136, 109);
-  gap: 1rem;
+  gap: 5rem;
 }
 
-/* --- */
-
-.auth-options {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.app-header {
   text-align: center;
-  margin-top: 2rem;
-}
-
-/* --- */
-
-.todo-item-wrapper {
-  width: 100%;
-}
-
-/* --- */
-
-.todo-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  gap: 2rem;
-  padding: 1rem;
-  border-radius: 1rem;
-  background-color: #879e6c;
-  border: 1px solid whitesmoke;
-}
-
-.todo-item:hover {
-  background-color: #6ba154;
-}
-
-/* --- */
-
-.btn-todo {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  background-color: #879e6c;
-  border: 1px solid black;
   color: white;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.btn-todo:hover {
-  background-color: #6c7a4d;
-}
-
-.btn-todo:disabled {
-  background-color: #827c7c;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-/* --- */
-
-.form-check {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.form-check-input:hover {
-  cursor: pointer;
-}
-
-.form-check-label:hover {
-  cursor: pointer;
-}
-
-/* --- */
-
-.icon-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.note-icon {
-  cursor: pointer;
-  color: #000;
-  padding: 0.1rem;
-}
-
-.note-icon:hover {
-  background-color: #9e6c6c;
-  border-radius: 0.5rem;
-  padding: 0.1rem;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
-
-/* Formular-Stile */
-.todo-form {
-  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1rem;
+  gap: 0.4rem;
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -1rem;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #ccc, transparent);
+    opacity: 0.6;
+  }
+
+  & h1 {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  & subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    font-weight: 300;
+  }
+}
+
+.main-menu-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.main-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  flex: 1;
+}
+
+/* ----- Main-menu Btn Styles START ----- */
+
+.menu-btn {
+  background: rgb(239, 239, 239);
+  border: none;
   border-radius: 1rem;
-  background-color: #879e6c;
-  border: 1px solid whitesmoke;
+  padding: 0.5rem;
+  gap: 0.6rem;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.258);
+  height: 5rem;
+}
+
+.btn-icon {
+  font-size: 2rem;
+  text-align: center;
+}
+
+.btn-content h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.2rem;
+  color: #333;
+}
+
+.btn-content p {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.guest-btn {
+  border-left: 4px solid #4caf50;
+}
+
+.guest-btn-icon {
+  background-color: #4caf50;
+  mask: url("assets/icons/badge.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.register-btn {
+  border-left: 4px solid #2196f3;
+}
+
+.register-btn-icon {
+  background-color: #2196f3;
+  mask: url("assets/icons/app_registration.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.login-btn {
+  border-left: 4px solid #ff9800;
+}
+
+.login-btn-icon {
+  background-color: #ff9800;
+  mask: url("assets/icons/login.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.option-btn {
+  border-left: 4px solid #000000;
+}
+
+.option-btn-icon {
+  background-color: #000000;
+  mask: url("assets/icons/manufacturing.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+/* ----- Main-menu Btn Styles END ----- */
+
+/* ----- Register Form Styles START ----- */
+
+.register-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.register-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  flex: 1;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-input-generally:hover:not(:focus) {
-  background-color: #d0dbcb;
-  cursor: pointer;
+  gap: 0.3rem;
 }
 
 .form-group label {
-  font-weight: bold;
-  pointer-events: none;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-left: 0.2rem;
 }
 
-.form-input,
-.form-textarea {
-  padding: 0.5rem;
-  border: 1px solid #6c7a4d;
-  border-radius: 0.5rem;
-  background-color: #a8b8a1;
-  color: #333;
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid transparent;
+  border-radius: 0.8rem;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.form-input:focus,
-.form-textarea:focus {
+.form-group input[type="text"]:focus,
+.form-group input[type="email"]:focus,
+.form-group input[type="password"]:focus {
   outline: none;
-  border-color: #ad0101;
-  box-shadow: 0 0 5px rgba(173, 1, 1, 0.5);
+  border-color: #2196f3;
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+  transform: translateY(-1px);
 }
 
-.form-textarea {
-  resize: vertical;
-  min-height: 60px;
+.form-group input::placeholder {
+  color: #999;
+  opacity: 0.8;
 }
 
-.form-checkbox {
+.checkbox-group {
   flex-direction: row;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.8rem;
+  margin: 0.5rem 0;
 }
 
-.todo-item-completed {
-  text-decoration: line-through;
-  color: #6c7a4d;
+.checkbox-group input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+  accent-color: #2196f3;
+  cursor: pointer;
 }
 
-.form-checkbox-input {
-  width: 1rem;
-  height: 1rem;
+.checkbox-group label {
+  color: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin: 0;
+  line-height: 1.4;
 }
 
-.form-actions {
+.registerSubmit-btn .btn-content h3,
+.registerSubmit-btn .btn-content p {
+  color: white;
+}
+
+.registerSubmit-btn {
+  background: linear-gradient(135deg, #2196f3, #1976d2);
+  border-left: 4px solid #4caf50;
+}
+
+.registerSubmit-btn-icon {
+  background-color: #4caf50;
+  mask: url("assets/icons/person_add.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.registerCancel-btn {
+  border-left: 4px solid #ff5722;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.registerCancel-btn .btn-content h3,
+.registerCancel-btn .btn-content p {
+  color: white;
+}
+
+.registerCancel-btn-icon {
+  background-color: #ff5722;
+  mask: url("assets/icons/person_cancel.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+/* ----- Register Form Styles END ----- */
+
+/* ----- Login Form Styles START ----- */
+
+.login-wrapper {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.login-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  flex: 1;
+}
+
+.loginSubmit-btn .btn-content h3,
+.loginSubmit-btn .btn-content p {
+  color: white;
+}
+
+.loginSubmit-btn {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  border-left: 4px solid #4caf50;
+}
+
+.loginSubmit-btn-icon {
+  background-color: #4caf50;
+  mask: url("assets/icons/login.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.loginCancel-btn {
+  border-left: 4px solid #ff5722;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.loginCancel-btn .btn-content h3,
+.loginCancel-btn .btn-content p {
+  color: white;
+}
+
+.loginCancel-btn-icon {
+  background-color: #ff5722;
+  mask: url("assets/icons/person_cancel.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+/* ----- Login Form Styles END ----- */
+
+/* ----- Options Menu Styles START ----- */
+
+.options-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  flex: 1;
+}
+
+.options-intro {
+  text-align: center;
+  color: white;
+}
+
+.options-intro h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.options-intro p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.options-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  flex: 1;
+}
+
+.theme-toggle-btn {
+  border-left: 4px solid #9c27b0;
+}
+
+.theme-toggle-btn-icon {
+  background-color: #9c27b0;
+  mask: url("assets/icons/brightness.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.personal-data-btn {
+  border-left: 4px solid #00bcd4;
+}
+
+.personal-data-btn-icon {
+  background-color: #00bcd4;
+  mask: url("assets/icons/person_edit.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.optionsCancel-btn {
+  border-left: 4px solid #ff5722;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.optionsCancel-btn .btn-content h3,
+.optionsCancel-btn .btn-content p {
+  color: white;
+}
+
+.optionsCancel-btn-icon {
+  background-color: #ff5722;
+  mask: url("assets/icons/arrow_back.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+/* ----- Options Menu Styles END ----- */
+
+/* ----- Personal Data Menu Styles START ----- */
+
+.personal-data-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  flex: 1;
+}
+
+.personal-data-intro {
+  text-align: center;
+  color: white;
+}
+
+.personal-data-intro h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.personal-data-intro p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.personal-data-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  flex: 1;
+}
+
+.reset-password-btn {
+  border-left: 4px solid #f44336;
+}
+
+.reset-password-btn-icon {
+  background-color: #f44336;
+  mask: url("assets/icons/lock_reset.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.download-notes-btn {
+  border-left: 4px solid #2196f3;
+}
+
+.download-notes-btn-icon {
+  background-color: #2196f3;
+  mask: url("assets/icons/download.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.upload-notes-btn {
+  border-left: 4px solid #ff9800;
+}
+
+.upload-notes-btn-icon {
+  background-color: #ff9800;
+  mask: url("assets/icons/upload.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.personalDataCancel-btn {
+  border-left: 4px solid #ff5722;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.personalDataCancel-btn .btn-content h3,
+.personalDataCancel-btn .btn-content p {
+  color: white;
+}
+
+.personalDataCancel-btn-icon {
+  background-color: #ff5722;
+  mask: url("assets/icons/arrow_back.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+/* ----- Personal Data Menu Styles END ----- */
+
+/* ----- Change Password Menu Styles START ----- */
+
+.change-password-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  flex: 1;
+}
+
+.change-password-intro {
+  text-align: center;
+  color: white;
+}
+
+.change-password-intro h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.change-password-intro p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.change-password-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  flex: 1;
+}
+
+.changePasswordSubmit-btn .btn-content h3,
+.changePasswordSubmit-btn .btn-content p {
+  color: white;
+}
+
+.changePasswordSubmit-btn {
+  background: linear-gradient(135deg, #4caf50, #388e3c);
+  border-left: 4px solid #2e7d32;
+}
+
+.changePasswordSubmit-btn-icon {
+  background-color: #fff;
+  mask: url("assets/icons/save.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.changePasswordCancel-btn {
+  border-left: 4px solid #ff5722;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.changePasswordCancel-btn .btn-content h3,
+.changePasswordCancel-btn .btn-content p {
+  color: white;
+}
+
+.changePasswordCancel-btn-icon {
+  background-color: #ff5722;
+  mask: url("assets/icons/arrow_back.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+/* ----- Change Password Menu Styles END ----- */
+
+/* ----- Trash Menu Styles START ----- */
+
+.trash-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  flex: 1;
+}
+
+.trash-intro {
+  text-align: center;
+  color: white;
+}
+
+.trash-intro h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.trash-intro p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.trash-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.empty-trash-btn {
+  border-left: 4px solid #f44336;
+}
+
+.empty-trash-btn-icon {
+  background-color: #f44336;
+  mask: url("assets/icons/delete_forever.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.trash-filter-btn {
+  border-left: 4px solid #2196f3;
+}
+
+.trash-filter-btn-icon {
+  background-color: #2196f3;
+  mask: url("assets/icons/filter_list.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.trashCancel-btn {
+  border-left: 4px solid #ff5722;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.trashCancel-btn .btn-content h3,
+.trashCancel-btn .btn-content p {
+  color: white;
+}
+
+.trashCancel-btn-icon {
+  background-color: #ff5722;
+  mask: url("assets/icons/arrow_back.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.trash-notes-container {
   margin-top: 1rem;
+}
+
+.trash-notes-container h3 {
+  color: white;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.trash-notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.trash-note-placeholder {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.8rem;
+  padding: 2rem;
+  text-align: center;
+  color: white;
+  opacity: 0.7;
+}
+
+.trash-note-placeholder p {
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* ----- Trash Menu Styles END ----- */
+
+/* ----- Notes Menu Styles START ----- */
+
+.notes-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  flex: 1;
+}
+
+.notes-intro {
+  text-align: center;
+  color: white;
+}
+
+.notes-intro h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.notes-intro p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.notes-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.notesSave-btn {
+  border-left: 4px solid #4caf50;
+}
+
+.notesSave-btn-icon {
+  background-color: #4caf50;
+  mask: url("assets/icons/save.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.notes-filter-btn {
+  border-left: 4px solid #2196f3;
+}
+
+.notes-filter-btn-icon {
+  background-color: #2196f3;
+  mask: url("assets/icons/filter_list.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.notesCancel-btn {
+  border-left: 4px solid #ff5722;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.notesCancel-btn .btn-content h3,
+.notesCancel-btn .btn-content p {
+  color: white;
+}
+
+.notesCancel-btn-icon {
+  background-color: #ff5722;
+  mask: url("assets/icons/arrow_back.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Note Creation Styles */
+.note-creation {
+  margin-top: 1rem;
+}
+
+.note-creation h3 {
+  color: white;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.note-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.note-form textarea {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid transparent;
+  border-radius: 0.8rem;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  resize: vertical;
+  min-height: 120px;
+}
+
+.note-form textarea:focus {
+  outline: none;
+  border-color: #2196f3;
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+  transform: translateY(-1px);
+}
+
+.note-form textarea::placeholder {
+  color: #999;
+  opacity: 0.8;
+}
+
+/* Note Actions */
+.note-actions {
+  display: flex;
   gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
 }
 
-.btn-todo-submit {
-  background-color: #6c7a4d;
+.action-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-.btn-todo-submit:hover {
-  background-color: #5a6640;
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.action-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.bookmark-icon {
+  background-color: #ff9800;
+  mask: url("assets/icons/bookmark.svg") no-repeat center;
+  mask-size: contain;
+}
+
+.save-note-icon {
+  background-color: #4caf50;
+  mask: url("assets/icons/save.svg") no-repeat center;
+  mask-size: contain;
+}
+
+.share-icon {
+  background-color: #9c27b0;
+  mask: url("assets/icons/share.svg") no-repeat center;
+  mask-size: contain;
+}
+
+.copy-icon {
+  background-color: #2196f3;
+  mask: url("assets/icons/content_copy.svg") no-repeat center;
+  mask-size: contain;
+}
+
+.delete-note-icon {
+  background-color: #f44336;
+  mask: url("assets/icons/delete.svg") no-repeat center;
+  mask-size: contain;
+}
+
+/* ----- Notes Menu Styles END ----- */
+
+/* ----- Notes List Menu Styles START ----- */
+
+.notes-list-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  flex: 1;
+}
+
+.notes-list-intro {
+  text-align: center;
+  color: white;
+}
+
+.notes-list-intro h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.notes-list-intro p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.notes-list-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.notes-list-filter-btn {
+  border-left: 4px solid #2196f3;
+}
+
+.notes-list-filter-btn-icon {
+  background-color: #2196f3;
+  mask: url("assets/icons/filter_list.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.notesListCancel-btn {
+  border-left: 4px solid #ff5722;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.notesListCancel-btn .btn-content h3,
+.notesListCancel-btn .btn-content p {
+  color: white;
+}
+
+.notesListCancel-btn-icon {
+  background-color: #ff5722;
+  mask: url("assets/icons/arrow_back.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Notes List Container */
+.notes-list-container {
+  margin-top: 2rem;
+}
+
+.notes-list-container h3 {
+  color: white;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.note-placeholder {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.8rem;
+  padding: 2rem;
+  text-align: center;
+  color: white;
+  opacity: 0.7;
+}
+
+.note-placeholder p {
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* ----- Notes List Menu Styles END ----- */
+
+/* ----- Note View Menu Styles START ----- */
+
+.note-view-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  flex: 1;
+}
+
+.note-view-intro {
+  text-align: center;
+  color: white;
+}
+
+.note-view-intro h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.note-view-intro p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.note-view-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.noteViewSave-btn {
+  border-left: 4px solid #4caf50;
+}
+
+.noteViewSave-btn-icon {
+  background-color: #4caf50;
+  mask: url("assets/icons/save.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.noteViewBack-btn {
+  border-left: 4px solid #2196f3;
+}
+
+.noteViewBack-btn-icon {
+  background-color: #2196f3;
+  mask: url("assets/icons/arrow_back.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Note Display Styles */
+.note-display {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 1rem;
+  padding: 0.8rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.note-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.note-header h3 {
+  color: #333;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+}
+
+.note-content-display {
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  min-height: 100px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Note View Actions */
+.note-view-actions {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.bookmark-view-icon {
+  background-color: #ff9800;
+  mask: url("assets/icons/bookmark.svg") no-repeat center;
+  mask-size: contain;
+}
+
+.edit-note-icon {
+  background-color: #4caf50;
+  mask: url("assets/icons/edit.svg") no-repeat center;
+  mask-size: contain;
+}
+
+.share-note-icon {
+  background-color: #9c27b0;
+  mask: url("assets/icons/share.svg") no-repeat center;
+  mask-size: contain;
+}
+
+.copy-note-icon {
+  background-color: #2196f3;
+  mask: url("assets/icons/content_copy.svg") no-repeat center;
+  mask-size: contain;
+}
+
+.delete-view-note-icon {
+  background-color: #f44336;
+  mask: url("assets/icons/delete.svg") no-repeat center;
+  mask-size: contain;
+}
+
+/* ----- Note View Menu Styles END ----- */
+
+/* ----- User Dashboard Menu Styles START ----- */
+
+.dashboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  flex: 1;
+}
+
+.dashboard-intro {
+  text-align: center;
+  color: white;
+}
+
+.dashboard-intro h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-intro p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.dashboard-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  flex: 1;
+}
+
+.notes-list-dashboard-btn {
+  border-left: 4px solid #2196f3;
+}
+
+.notes-list-dashboard-btn-icon {
+  background-color: #2196f3;
+  mask: url("assets/icons/notes.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.create-note-dashboard-btn {
+  border-left: 4px solid #4caf50;
+}
+
+.create-note-dashboard-btn-icon {
+  background-color: #4caf50;
+  mask: url("assets/icons/add_note.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.trash-dashboard-btn {
+  border-left: 4px solid #f44336;
+}
+
+.trash-dashboard-btn-icon {
+  background-color: #f44336;
+  mask: url("assets/icons/delete.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+.dashboardCancel-btn {
+  border-left: 4px solid #ff5722;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.dashboardCancel-btn .btn-content h3,
+.dashboardCancel-btn .btn-content p {
+  color: white;
+}
+
+.dashboardCancel-btn-icon {
+  background-color: #ff5722;
+  mask: url("assets/icons/arrow_back.svg") no-repeat center;
+  mask-size: contain;
+  width: 2rem;
+  height: 2rem;
+}
+
+/* ----- User Dashboard Menu Styles END ----- */
+
+.app-footer {
+  text-align: center;
+  color: white;
+  opacity: 0.8;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

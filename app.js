@@ -1,236 +1,574 @@
 /**
- * Todo-App Frontend - Haupt-Anwendung (Refactored)
+ * Todo-App Frontend - Hauptanwendung mit State Management
  * Features:
- * - Session-basierte Authentifizierung (User/Gast)
- * - RESTful API-Kommunikation
- * - Dynamisches UI-Rendering
+ * - Zentrales State Management
+ * - Multi-View Navigation
+ * - Smart Caching mit Service Layer
+ * - Session-basierte Authentifizierung
  */
 
 "use strict";
 
 /**
- * Todo-App Hauptklasse (als Function Constructor)
- * Verwaltet UI-Status und koordiniert SessionManager + ApiClient
+ * Todo-App Hauptklasse (Refactored with State Management)
  * @constructor
  */
-function todoApp() {
-  /** @type {HTMLElement|null} Container-Element für das UI */
-  this.container = null;
+function TodoApp() {
+  // Core State Management
+  this.appState = null;
+  this.viewManager = null;
+  this.todoService = null;
 
-  /** @type {string} Aktueller UI-Modus: "guest", "list", "form" */
-  this.mode = "guest";
-
-  /** @type {Object} Aktuell bearbeitetes Todo */
-  this.currentTodo = {};
-
-  /** @type {SessionManager} Session-Management */
-  this.sessionManager = new SessionManager();
-
-  /** @type {ApiClient} API-Client */
-  this.apiClient = new ApiClient();
+  // Legacy components (will be integrated)
+  this.sessionManager = null;
+  this.apiClient = null;
 
   /**
-   * App-Initialisierung
+   * App-Initialisierung mit State Management
    */
   this.init = function () {
-    this.container = document.querySelector("#content");
-    this.container.innerHTML = "";
+    console.log("🚀 Todo App - Initializing with State Management...");
 
-    // Error-Handler für API-Client registrieren
-    this.apiClient.setErrorHandler((msg) => this.showError(msg));
+    // Initialize core components
+    this.initializeComponents();
 
-    console.log("🚀 App-Start: Session-Validierung...");
+    // Setup subscriptions
+    this.setupStateSubscriptions();
 
-    // Session über SessionManager validieren
+    // Setup event listeners
+    this.setupEventListeners();
+
+    // Start session validation
+    this.validateSession();
+  };
+
+  /**
+   * Initialize all core components
+   * @private
+   */
+  this.initializeComponents = function () {
+    // Initialize State Management
+    this.appState = new AppState();
+
+    // Initialize legacy components
+    this.apiClient = new ApiClient();
+    this.sessionManager = new SessionManager();
+
+    // Initialize service layer
+    this.todoService = new TodoService(this.apiClient, this.appState);
+
+    // Initialize view manager
+    this.viewManager = new ViewManager(this.appState);
+
+    // Error handler für API-Client
+    this.apiClient.setErrorHandler((msg) => {
+      this.appState.setError(msg);
+      this.appState.addNotification({
+        type: "error",
+        message: msg,
+      });
+    });
+
+    console.log("✅ Core components initialized");
+  };
+
+  /**
+   * Setup state change subscriptions
+   * @private
+   */
+  this.setupStateSubscriptions = function () {
+    this.appState.subscribe(({ changedKeys, newState }) => {
+      // Log state changes in development
+      if (ENV && ENV.DEBUG) {
+        console.log("🔄 State changed:", changedKeys, newState);
+      }
+
+      // Handle specific state changes
+      if (changedKeys.includes("sessionType")) {
+        this.onSessionChange(newState.sessionType);
+      }
+
+      if (changedKeys.includes("error") && newState.error) {
+        this.displayError(newState.error);
+      }
+
+      if (changedKeys.includes("currentTodo")) {
+        this.onCurrentTodoChange(newState.currentTodo);
+      }
+    });
+  };
+
+  /**
+   * Setup global event listeners for navigation
+   * @private
+   */
+  this.setupEventListeners = function () {
+    // Main Menu Navigation
+    this.addClickListener("guestBtn", () => this.startGuestSession());
+    this.addClickListener("registerBtn", () => this.navigateToView("register"));
+    this.addClickListener("loginBtn", () => this.navigateToView("login"));
+    this.addClickListener("optionBtn", () => this.navigateToView("options"));
+
+    // Authentication Form Events
+    this.addClickListener("registerSubmitBtn", (e) =>
+      this.handleRegisterSubmit(e)
+    );
+    this.addClickListener("registerCancelBtn", () =>
+      this.navigateToView("main-menu")
+    );
+    this.addClickListener("loginSubmitBtn", (e) => this.handleLoginSubmit(e));
+    this.addClickListener("loginCancelBtn", () =>
+      this.navigateToView("main-menu")
+    );
+
+    // Options Menu
+    this.addClickListener("themeToggleBtn", () => this.toggleTheme());
+    this.addClickListener("personalDataBtn", () =>
+      this.navigateToView("personal-data")
+    );
+    this.addClickListener("optionsCancelBtn", () =>
+      this.navigateToView("main-menu")
+    );
+
+    // Personal Data Menu
+    this.addClickListener("resetPasswordBtn", () =>
+      this.navigateToView("change-password")
+    );
+    this.addClickListener("downloadNotesBtn", () => this.downloadTodos());
+    this.addClickListener("uploadNotesBtn", () => this.uploadTodos());
+    this.addClickListener("personalDataCancelBtn", () =>
+      this.navigateToView("options")
+    );
+
+    // Dashboard Navigation
+    this.addClickListener("notesListDashboardBtn", () =>
+      this.navigateToView("notes-list")
+    );
+    this.addClickListener("createNoteDashboardBtn", () => this.createNewTodo());
+    this.addClickListener("trashDashboardBtn", () =>
+      this.navigateToView("trash")
+    );
+    this.addClickListener("dashboardCancelBtn", () =>
+      this.navigateToView("main-menu")
+    );
+
+    // Notes Management
+    this.addClickListener("notesSaveBtn", (e) => this.handleSaveTodo(e));
+    this.addClickListener("notesCancelBtn", () => this.navigateBack());
+    this.addClickListener("notesListCancelBtn", () =>
+      this.navigateToView("dashboard")
+    );
+    this.addClickListener("noteViewBackBtn", () =>
+      this.navigateToView("notes-list")
+    );
+    this.addClickListener("editNoteBtn", () => this.editCurrentTodo());
+
+    // Trash Management
+    this.addClickListener("emptyTrashBtn", () => this.emptyTrash());
+    this.addClickListener("trashCancelBtn", () =>
+      this.navigateToView("dashboard")
+    );
+
+    // Dynamic event delegation for todo items
+    document.addEventListener("click", (e) => this.handleDynamicEvents(e));
+  };
+
+  /**
+   * Helper to add click event listeners
+   * @private
+   */
+  this.addClickListener = function (id, handler) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener("click", handler);
+    }
+  };
+
+  /**
+   * Handle dynamic events (todo items, etc.)
+   * @private
+   */
+  this.handleDynamicEvents = function (e) {
+    const action = e.target.dataset.action;
+    const todoId = e.target.dataset.id;
+
+    if (action && todoId) {
+      switch (action) {
+        case "edit":
+          this.editTodo(parseInt(todoId));
+          break;
+        case "delete":
+          this.deleteTodo(parseInt(todoId));
+          break;
+        case "toggle":
+          this.toggleTodo(parseInt(todoId));
+          break;
+        case "view":
+          this.viewTodo(parseInt(todoId));
+          break;
+        case "restore":
+          this.restoreTodo(parseInt(todoId));
+          break;
+      }
+    }
+  };
+
+  /**
+   * Session validation using existing SessionManager
+   */
+  this.validateSession = function () {
+    console.log("🔐 Validating session...");
+
     this.sessionManager
       .validateSession((url, method, data) =>
         this.apiClient.request(url, method, data)
       )
       .then((response) => {
-        console.log("Session-Validierung Antwort:", response);
+        console.log("Session validation response:", response);
 
-        // Modus basierend auf Session setzen
         if (response.valid) {
-          this.mode = this.mode === "guest" ? "list" : this.mode;
-        } else {
-          this.mode = "guest";
-        }
+          // Update state with session info
+          if (response.type === "user") {
+            this.appState.setState({
+              sessionType: "user",
+              userId: response.userId,
+              userEmail: response.email,
+              sessionId: response.sessionId,
+            });
+            this.navigateToView("dashboard");
+          } else if (response.type === "guest") {
+            this.appState.setState({
+              sessionType: "guest",
+              sessionId: response.guestId,
+            });
+            this.navigateToView("dashboard");
+          }
 
-        this.buildUI();
+          // Load todos if session is valid
+          this.todoService.loadTodos();
+        } else {
+          // No valid session - show main menu
+          this.appState.setState({
+            sessionType: null,
+            userId: null,
+            userEmail: null,
+            sessionId: null,
+          });
+          this.navigateToView("main-menu");
+        }
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error("Session validation failed:", error);
         this.sessionManager.reset();
-        this.mode = "guest";
-        this.buildUI();
+        this.appState.setState({
+          sessionType: null,
+          error: "Session-Validierung fehlgeschlagen",
+        });
+        this.navigateToView("main-menu");
       });
   };
 
   /**
-   * UI aufbauen
+   * Start guest session
    */
-  this.buildUI = function () {
-    this.container.innerHTML = "";
+  this.startGuestSession = function () {
+    this.appState.setLoading(true);
 
-    // Session-Info über SessionManager anzeigen
-    const sessionInfoHTML = this.sessionManager.getSessionInfoHTML();
-    if (sessionInfoHTML) {
-      this.container.insertAdjacentHTML("beforeend", sessionInfoHTML);
-    }
-
-    // UI basierend auf Session-Status
-    if (
-      !this.sessionManager.isUserLoggedIn() &&
-      !this.sessionManager.isGuestStarted()
-    ) {
-      this.mode = "guest";
-      this.printAuthOptions();
-    } else if (this.sessionManager.isUserLoggedIn()) {
-      if (this.mode === "guest") this.mode = "list";
-      this.printLogout();
-      this.printModeContent();
-    } else if (this.sessionManager.isGuestStarted()) {
-      if (this.mode === "guest") this.mode = "list";
-      this.printGuestInfo();
-      this.printModeContent();
-    }
-  };
-
-  /**
-   * Modus-abhängigen Content anzeigen
-   */
-  this.printModeContent = function () {
-    if (this.mode === "list") {
-      UIRenderer.renderModeButtons(this.container, this.mode, this);
-      this.loadAndDisplayTodos();
-    } else if (this.mode === "form") {
-      UIRenderer.renderModeButtons(this.container, this.mode, this);
-      UIRenderer.renderTodoForm(this.container, this.currentTodo, this);
-    }
-  };
-
-  /**
-   * Todos laden und anzeigen (verwendet ApiClient)
-   */
-  this.loadAndDisplayTodos = function () {
-    this.apiClient
-      .getAllTodos()
-      .then((todos) => {
-        todos.forEach((todo) => this.printTodo(todo));
+    this.sessionManager
+      .startGuestSession((url, method, data) =>
+        this.apiClient.request(url, method, data)
+      )
+      .then((response) => {
+        this.appState.setState({
+          sessionType: "guest",
+          sessionId: response.guestId,
+          loading: false,
+        });
+        this.appState.addNotification({
+          type: "success",
+          message: "Gast-Session gestartet!",
+        });
+        this.navigateToView("dashboard");
       })
-      .catch(console.error);
+      .catch((error) => {
+        this.appState.setState({
+          loading: false,
+          error: "Gast-Session konnte nicht gestartet werden",
+        });
+      });
   };
 
   /**
-   * Gast-spezifische UI-Elemente rendern
+   * Handle user registration
    */
-  this.printGuestInfo = function () {
-    UIRenderer.renderGuestInfo(this.container, this);
+  this.handleRegisterSubmit = function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById("registerName").value;
+    const email = document.getElementById("registerEmail").value;
+    const password = document.getElementById("registerPassword").value;
+    const terms = document.getElementById("registerTerms").checked;
+
+    if (!terms) {
+      this.appState.addNotification({
+        type: "error",
+        message: "Bitte akzeptiere die Nutzungsbedingungen",
+      });
+      return;
+    }
+
+    this.appState.setLoading(true);
+
+    // Use sessionManager for registration
+    this.sessionManager
+      .registerUser({ name, email, password }, (url, method, data) =>
+        this.apiClient.request(url, method, data)
+      )
+      .then((response) => {
+        this.appState.setState({
+          sessionType: "user",
+          userId: response.userId,
+          userEmail: email,
+          loading: false,
+        });
+        this.appState.addNotification({
+          type: "success",
+          message: "Registrierung erfolgreich!",
+        });
+        this.navigateToView("dashboard");
+        this.todoService.loadTodos();
+      })
+      .catch((error) => {
+        this.appState.setState({
+          loading: false,
+          error: "Registrierung fehlgeschlagen",
+        });
+      });
   };
 
   /**
-   * Aktuelles Todo-Objekt zurücksetzen
-   * Initialisiert leeres Todo für Neu-Erstellung
+   * Handle user login
    */
-  this.resetCurrentTodo = function () {
-    this.currentTodo = {
-      id: 0,
-      title: "",
-      description: "",
-      completed: 0,
-    };
+  this.handleLoginSubmit = function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+
+    this.appState.setLoading(true);
+
+    this.sessionManager
+      .loginUser({ email, password }, (url, method, data) =>
+        this.apiClient.request(url, method, data)
+      )
+      .then((response) => {
+        this.appState.setState({
+          sessionType: "user",
+          userId: response.userId,
+          userEmail: email,
+          loading: false,
+        });
+        this.appState.addNotification({
+          type: "success",
+          message: "Anmeldung erfolgreich!",
+        });
+        this.navigateToView("dashboard");
+        this.todoService.loadTodos();
+      })
+      .catch((error) => {
+        this.appState.setState({
+          loading: false,
+          error: "Anmeldung fehlgeschlagen",
+        });
+      });
   };
 
   /**
-   * UI-Modus wechseln ohne komplette Neuinitialisierung
-   * @param {string} mode - Neuer Modus ("list", "form", "guest")
+   * Navigation helpers
    */
-  this.changeMode = function (mode) {
-    this.mode = mode;
-    // Nur UI neu bauen, nicht komplette App neu starten
-    this.buildUI();
+  this.navigateToView = function (viewName, data = {}) {
+    this.appState.navigateToView(viewName, data);
+  };
+
+  this.navigateBack = function () {
+    this.appState.navigateBack();
   };
 
   /**
-   * Authentifizierungs-Optionen rendern
+   * Todo management functions
    */
-  this.printAuthOptions = function () {
-    UIRenderer.renderAuthOptions(this.container, this);
+  this.createNewTodo = function () {
+    this.todoService.clearCurrentTodo();
+    this.navigateToView("notes");
   };
 
-  /**
-   * Login-Formular rendern (verwendet UIRenderer)
-   */
-  this.printLoginForm = function () {
-    UIRenderer.renderLoginForm(this.container, this);
+  this.editTodo = function (todoId) {
+    this.todoService.setCurrentTodo(todoId);
+    this.navigateToView("notes");
   };
 
-  /**
-   * Registrierungs-Formular rendern (verwendet UIRenderer)
-   */
-  this.printRegisterForm = function () {
-    UIRenderer.renderRegisterForm(this.container, this);
+  this.viewTodo = function (todoId) {
+    this.todoService.setCurrentTodo(todoId);
+    this.navigateToView("note-view");
   };
 
-  /**
-   * Logout-Button rendern (verwendet UIRenderer)
-   */
-  this.printLogout = function () {
-    UIRenderer.renderLogoutButton(this.container, this);
+  this.deleteTodo = function (todoId) {
+    if (confirm("Todo wirklich löschen?")) {
+      this.todoService.deleteTodo(todoId);
+    }
   };
 
-  /**
-   * Einzelnes Todo-Item rendern (verwendet UIRenderer)
-   */
-  this.printTodo = function (todo) {
-    UIRenderer.renderTodoItem(this.container, todo, this);
+  this.toggleTodo = function (todoId) {
+    this.todoService.toggleTodo(todoId);
   };
 
-  /**
-   * Todo-Speichern-Handler (verwendet ApiClient)
-   */
-  this.saveTodoHandler = function (event, mode = "save") {
-    event.preventDefault();
-    const title = this.container.querySelector("#todo-title").value;
-    const description = this.container.querySelector("#todo-description").value;
-    const completed = this.container.querySelector("#todo-completed").checked;
+  this.restoreTodo = function (todoId) {
+    this.todoService.restoreTodo(todoId);
+  };
+
+  this.handleSaveTodo = function (e) {
+    e.preventDefault();
+
+    const title = document.getElementById("noteTitle").value;
+    const description = document.getElementById("noteContent").value;
+    const completed = document.getElementById("noteCompleted").checked;
 
     const todoData = { title, description, completed: completed ? 1 : 0 };
-    const todoId = parseInt(event.target.dataset.id);
+    const currentTodo = this.appState.getState().currentTodo;
 
-    if (todoId > 0) {
-      this.apiClient
-        .updateTodo(todoId, todoData)
-        .then(() => this.changeMode("list"));
-    } else if (mode === "save") {
-      this.apiClient.createTodo(todoData).then(() => this.changeMode("list"));
+    if (currentTodo && currentTodo.id) {
+      // Update existing todo
+      this.todoService
+        .updateTodo(currentTodo.id, todoData)
+        .then(() => this.navigateToView("notes-list"));
     } else {
-      this.apiClient.createTodo(todoData).then(() => {
-        this.resetCurrentTodo();
-        this.changeMode("form");
-      });
+      // Create new todo
+      this.todoService
+        .createTodo(todoData)
+        .then(() => this.navigateToView("notes-list"));
+    }
+  };
+
+  this.editCurrentTodo = function () {
+    const currentTodo = this.appState.getState().currentTodo;
+    if (currentTodo) {
+      this.navigateToView("notes");
     }
   };
 
   /**
-   * Fehleranzeige im UI
+   * Theme management
    */
-  this.showError = function (msg) {
-    let errorDiv = this.container.querySelector(".todo-error");
-    if (!errorDiv) {
-      errorDiv = document.createElement("div");
-      errorDiv.className = "todo-error";
-      errorDiv.style.color = "red";
-      errorDiv.style.margin = "1rem 0";
-      this.container.insertAdjacentElement("afterbegin", errorDiv);
+  this.toggleTheme = function () {
+    const currentTheme = this.appState.getState().theme;
+    const newTheme = currentTheme === "light" ? "dark" : "light";
+
+    this.appState.setState({ theme: newTheme });
+    document.body.setAttribute("data-theme", newTheme);
+
+    this.appState.addNotification({
+      type: "success",
+      message: `${newTheme === "dark" ? "Dunkles" : "Helles"} Theme aktiviert`,
+    });
+  };
+
+  /**
+   * Utility functions
+   */
+  this.downloadTodos = function () {
+    const todos = this.appState.getState().todos;
+    const dataStr = JSON.stringify(todos, null, 2);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(dataBlob);
+    link.download = "todos-backup.json";
+    link.click();
+
+    this.appState.addNotification({
+      type: "success",
+      message: "Todos erfolgreich heruntergeladen",
+    });
+  };
+
+  this.uploadTodos = function () {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const todos = JSON.parse(e.target.result);
+            // TODO: Implement upload to server
+            console.log("Uploaded todos:", todos);
+            this.appState.addNotification({
+              type: "success",
+              message: "Todos erfolgreich importiert",
+            });
+          } catch (error) {
+            this.appState.addNotification({
+              type: "error",
+              message: "Fehler beim Importieren der Todos",
+            });
+          }
+        };
+        reader.readAsText(file);
+      }
+    };
+    input.click();
+  };
+
+  this.emptyTrash = function () {
+    if (
+      confirm(
+        "Papierkorb wirklich leeren? Alle Todos werden endgültig gelöscht."
+      )
+    ) {
+      this.todoService.emptyTrash();
     }
-    errorDiv.textContent = msg;
+  };
+
+  /**
+   * Event handlers for state changes
+   */
+  this.onSessionChange = function (sessionType) {
+    console.log("Session changed to:", sessionType);
+    // Additional logic when session changes
+  };
+
+  this.onCurrentTodoChange = function (currentTodo) {
+    console.log("Current todo changed to:", currentTodo);
+    // Additional logic when current todo changes
+  };
+
+  /**
+   * Display error in UI
+   */
+  this.displayError = function (errorMessage) {
+    console.error("App Error:", errorMessage);
+    // Error is already handled by notifications in appState
   };
 }
 
 /**
- * DOM-Ready Event-Handler
+ * Initialize app when DOM is ready
  */
 document.addEventListener("DOMContentLoaded", () => {
-  const todoAppInstance = new todoApp();
-  todoAppInstance.init();
+  // Initialize ViewManager after DOM is ready
+  const todoApp = new TodoApp();
+  todoApp.init();
+
+  // Initialize ViewManager
+  if (todoApp.viewManager) {
+    todoApp.viewManager.init();
+  }
+
+  // Make app globally available for debugging
+  if (typeof window !== "undefined") {
+    window.todoApp = todoApp;
+    window.appState = todoApp.appState;
+  }
 });
