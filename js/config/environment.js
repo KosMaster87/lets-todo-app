@@ -16,19 +16,26 @@ const CONFIG = {
     SESSION_TIMEOUT: 1000 * 60 * 60, // 1 Stunde für Development
     LOG_LEVEL: "verbose",
   },
+  feature: {
+    API_BASE: "https://lets-todo-api-feat.dev2k.org/api",
+    DEBUG: true,
+    COOKIE_DOMAIN: ".dev2k.org",
+    SESSION_TIMEOUT: 1000 * 60 * 60, // 1 Stunde für Feature Testing
+    LOG_LEVEL: "debug",
+  },
+  staging: {
+    API_BASE: "https://lets-todo-api-stage.dev2k.org/api",
+    DEBUG: true,
+    COOKIE_DOMAIN: ".dev2k.org",
+    SESSION_TIMEOUT: 1000 * 60 * 30, // 30 Minuten für Staging
+    LOG_LEVEL: "info",
+  },
   production: {
     API_BASE: "https://lets-todo-api.dev2k.org/api",
     DEBUG: false,
     COOKIE_DOMAIN: ".dev2k.org",
     SESSION_TIMEOUT: 1000 * 60 * 60 * 24, // 24 Stunden für Production
     LOG_LEVEL: "error",
-  },
-  staging: {
-    API_BASE: "https://staging-lets-todo-api.dev2k.org/api",
-    DEBUG: true,
-    COOKIE_DOMAIN: ".dev2k.org",
-    SESSION_TIMEOUT: 1000 * 60 * 30, // 30 Minuten für Staging
-    LOG_LEVEL: "info",
   },
 };
 
@@ -45,8 +52,13 @@ function detectEnvironment() {
     return "development";
   }
 
-  // Staging: staging subdomain
-  if (hostname.includes("staging")) {
+  // Feature: feat subdomain
+  if (hostname.includes("feat")) {
+    return "feature";
+  }
+
+  // Staging: stage subdomain
+  if (hostname.includes("stage")) {
     return "staging";
   }
 
